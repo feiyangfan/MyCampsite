@@ -4,7 +4,7 @@
 
 ## Product Details
 
-### Q1: What are you planning to build?
+#### Q1: What are you planning to build?
 
 My Campsite is a mobile application that allows campers to geocache their memories in the form of short video clips or messages. Many campsite users develop a form of attachment to their campsite and will often come back to their same getaway location time and time again, but unlike a hotel, there is no guestbook. My Campsite allows campers to view and sign a “digital guestbook” tied to their location to make their camping experience an unforgettable one. The app serves as a tool to connect campers by allowing them to share images or videos of the family on vacation, a neat camp setup, or nature in its varying seasons, and view similar entries stretching back days, months, or even years.
 
@@ -12,19 +12,19 @@ Furthermore, park naturalists can use this app to share and highlight educationa
 
 Please see our mockup on [Figma!](https://www.figma.com/file/U6gluqQYh39eoiBUptQVpn/My-Campsite-draft-v1?node-id=0%3A1)
 
-### Q2: Who are your target users?
+#### Q2: Who are your target users?
 
 Our target users are campers, which encompasses a wide range of people. Some users we anticipate will be interested in our app are first-time campsite users who wish to discover points of interests and share their new experiences, first-time or returning campsite users who wish to sign a virtual guest book to create or continue a tradition, and seasoned users or park naturalists who wish to share stories and tips with other users. In addition, some users are given admin roles to monitor user content and manage camping site options provided by the app.
 
 Please see our user personas [here!](https://docs.google.com/document/d/1-ykGck_XBqfqPm2JWTnghnxHFujxPR4u96-p6_Xbw_c/edit?usp=sharing)
 
-### Q3: Why would your users choose your product? What are they using today to solve their problem/need?
+#### Q3: Why would your users choose your product? What are they using today to solve their problem/need?
 
 Our product solves a problem that most people have never thought of: how to leave digital messages for future campsite users and view messages from users in the past. On a higher level, what this does is promote a positive culture around camping and a feeling of connectedness to other campers. This allows users to discover new information, as it automatically serves location-specific content that allows users to easily discover points of interest, camping tips, and social media posts without having to sift through the wider internet.
 
 Our guest book feature connects campsite users to each other to foster community, unlike on generic social media platforms where user content is either from friends and family or served by a more general algorithm. Our app’s content is tied to physical location, which encourages prospective campsite-goers to discover the campsite’s content by themselves, rather than sitting at home and scrolling through photos from bed. All of these features align with Ontario Parks’ values, as they promote camping culture, community, and exploring nature.
 
-### Q4: How will you build it?
+#### Q4: How will you build it?
 
 The technology stack we will be using includes React Native and Expo for the front end, and Express.js for the backend services. We will use Heroku for backend deployment. For CI/CD and testing, we will use GitHub Actions, Jest, and Docker. The strategy for testing is to develop and run tests locally, and ensure that they pass before merging pull requests to the main branch.
 
@@ -35,8 +35,9 @@ The first layer of our application will consist of the login and email validated
 Past this layer, users and administrators will have access to our main application UI which features a map view using Google Maps Javascript API, and access to backend endpoints that provide current weather information from the Government of Canada Weather API (https://api.weather.gc.ca/), geolocation data of campsite locations, access to uploaded content, and profile information for the current user.
 
 We have provided a detailed drawing of our application’s architecture below for your visualization.
+![Architecture diagram](./architecture.png)
 
-### Q5: What are the user stories that make up the MVP?
+#### Q5: What are the user stories that make up the MVP?
 
 ## Please find our user stories [here!](https://docs.google.com/document/d/1GasjU5uEUGwRc0ZMOF_8cDe7pJPmr9xvX3mj73OEgfM/edit)
 
@@ -46,7 +47,7 @@ As per the discussions with our partner, this project will be made available to 
 
 ## Process Details
 
-### Q6: What are the roles & responsibilities on the team?
+#### Q6: What are the roles & responsibilities on the team?
 
 _Roles:_
 
@@ -118,7 +119,7 @@ Janine Newton
 - Focus: overall front end design/flow, UX/UI, view guestbooks feature, front end admin dashboard
 - Non-software work: set up and lead meetings, communicate with partner, ensure project direction meets partner’s specifications, assign tasks
 
-### Q7: What operational events will you have as a team?
+#### Q7: What operational events will you have as a team?
 
 We will conduct weekly scrum meetings online to ensure everyone is up-to-date on the development progresses of others, and discuss various development issues. We will organize code reviews on GitHub as major changes or additions are being developed, so that team members are aware of breaking changes or new libraries being made available. We will also use Discord for general communication and ad hoc meetings, separating important messages into the “reminders” channel and important links into the “links” channel.
 
@@ -128,11 +129,11 @@ Please see our meeting minutes [here.](https://docs.google.com/document/d/1rmmDh
 
 Currently, we meet bi-weekly with our partner. However, ad-hoc meetings may occur if important topics arise during development.
 
-### Q8: What artifacts will you use to self-organize?
+#### Q8: What artifacts will you use to self-organize?
 
 We will use GitHub Projects and create GitHub Issues to organize our work tasks. GitHub’s labelling feature allows us to prioritize issues based on urgency such as “high”, “medium”, and “low”. Tasks will be assigned to team members by the Project Manager and Scrum Master. Our project page will have sections “To Do”, “In Progress”, “Done” in which issues can be organized and moved along as tasks are completed.
 
-### Q9: What are the rules regarding how your team works?
+#### Q9: What are the rules regarding how your team works?
 
 _Communications:_
 
