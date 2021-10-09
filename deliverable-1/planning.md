@@ -39,7 +39,7 @@ We have provided a detailed drawing of our application’s architecture below fo
 
 #### Q5: What are the user stories that make up the MVP?
 
-## Please find our user stories [here!](https://docs.google.com/document/d/1GasjU5uEUGwRc0ZMOF_8cDe7pJPmr9xvX3mj73OEgfM/edit)
+Please find our user stories [here!](https://docs.google.com/document/d/1GasjU5uEUGwRc0ZMOF_8cDe7pJPmr9xvX3mj73OEgfM/edit)
 
 ## Intellectual Property Confidentiality Agreement
 
