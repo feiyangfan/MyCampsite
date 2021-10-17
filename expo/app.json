@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "team-project-12-ontario-public-service",
-    "slug": "team-project-12-ontario-public-service",
+    "name": "My Campsite",
+    "slug": "my-campsite",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
