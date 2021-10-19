@@ -4,7 +4,6 @@
  * Module dependencies.
  */
 
-// var app = require('../app');
 import app from "../app.js";
 import Debug from "debug";
 const debug = Debug("backend:server");
