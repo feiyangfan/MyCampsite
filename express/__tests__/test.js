@@ -1,8 +1,7 @@
-const request = require("supertest");
-const app = require("../app");
+import request from "supertest";
+import app from "../app.js";
 
 test("test index page", async () => {
-    const res = await request(app)
-        .get("/")
-    expect(res.statusCode).toEqual(200);
+  const res = await request(app).get("/");
+  expect(res.statusCode).toEqual(200);
 });
