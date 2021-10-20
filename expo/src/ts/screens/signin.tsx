@@ -1,6 +1,6 @@
 import React, {useEffect} from "react"
 import {StyleSheet, View} from "react-native"
-import {Button, Text, Input, BottomSheet, Divider, Header} from "react-native-elements"
+import {Button, Input, BottomSheet, Divider, Header} from "react-native-elements"
 import {useGoogleSignInPrompt, useUser} from "../lib/auth"
 import {useNavigation} from "@react-navigation/native"
 

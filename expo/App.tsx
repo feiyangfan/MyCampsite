@@ -10,6 +10,7 @@ import MapScreen from "./src/ts/screens/MapScreen";
 import GuestbookScreen from "./src/ts/screens/GuestbookScreen";
 import PostScreen from "./src/ts/screens/PostScreen";
 import SignIn from "./src/ts/screens/signin";
+import Me from "./src/ts/screens/me";
 import theme from "./src/ts/lib/theme";
 import { RootStackParamList } from "./src/ts/types";
 
@@ -27,18 +28,18 @@ const App = () => {
   return (
     <LayoutProviders>
       <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Home"
-          screenOptions={{ headerShown: false }}
-        >
-          <Stack.Group>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Group screenOptions={{headerShown: false}}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Map" component={MapScreen} />
             <Stack.Screen name="Guestbook" component={GuestbookScreen} />
             <Stack.Screen name="Post" component={PostScreen} />
           </Stack.Group>
-          <Stack.Group screenOptions={{ presentation: "transparentModal" }}>
+          <Stack.Group screenOptions={{presentation: "transparentModal"}}>
             <Stack.Screen name="SignIn" component={SignIn} />
+          </Stack.Group>
+          <Stack.Group screenOptions={{presentation: "modal"}}>
+            <Stack.Screen name="Me" component={Me} />
           </Stack.Group>
         </Stack.Navigator>
       </NavigationContainer>
