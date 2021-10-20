@@ -1,91 +1,131 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Text, View, StyleSheet, Dimensions } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, {useState, useRef, useEffect} from 'react';
+import {Text, View, StyleSheet, Dimensions} from 'react-native';
+import MapView, {Marker} from 'react-native-maps';
+import {Button} from "react-native-elements";
 import * as Location from 'expo-location';
 import * as Types from '../../../../types';
 
 
 const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
-    const [latitude, setLatitude] = useState<number>(45.39174144302487);
-    const [longitude, setLongitude] = useState<number>(-79.21459743503355);
-    const [userLatitude, setUserLatitude] = useState<number | null>(null);
-    const [userLongitude, setUserLongitude] = useState<number | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string>('');
-    const map = useRef<MapView>(null);
+  const [location, setLocation] = useState<number[]>([45.39174144302487, -79.21459743503355]);
+  const [userLocation, setUserLocation] = useState<number[]>([]);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [debugMode, setDebugMode] = useState(false);
+  const map = useRef<MapView>(null);
 
-    useEffect(() => {
-      (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
-          return;
-        }
-        let location = await Location.getCurrentPositionAsync({});
-        setUserLatitude(location.coords.latitude);
-        setUserLongitude(location.coords.longitude);
-      })();
-    }, []);
-
-      let text: string = 'Waiting..';
-      if (errorMsg) {
-        text = errorMsg;
-      } else if (location) {
-        text = JSON.stringify(location);
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
       }
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation([location.coords.latitude, location.coords.longitude]);
+    })();
+  }, []);
     
-    const [campsiteMarkers, setCampsiteMarkers] = useState<any[]>([]);
-    // load random campsites near arrowhead
-    useEffect(() => {
-      setCampsiteMarkers(Array.from({length: 30}, (_, i) => { 
-          return { num: i, latitude: latitude + Math.random()/500, longitude: longitude + Math.random()/500 }
-      }));
-    }, [])
+  const [campsiteMarkers, setCampsiteMarkers] = useState<any[]>([]);
+  // load random campsites near arrowhead
+  useEffect(() => {
+    setCampsiteMarkers(Array.from({length: 30}, (_, i) => { 
+        return { num: i, latitude: location[0] + Math.random()/500, longitude: location[1] + Math.random()/500 }
+    }));
+  }, [])
 
-    const CampsiteMarker = (props: any) => {
-      const [clicked, setClicked] = useState(false);
-      if (props.latitude && props.longitude) {
-          return (<Marker 
-              coordinate={{ latitude: props.latitude, longitude: props.longitude }} 
-              image={{width: 150, height: 150, uri: "https://picsum.photos/150"}}
-              onPress={() => setClicked(true)}
-          />);
-      }
-      return null;
+  const CampsiteMarker = (props: any) => {
+    const [clicked, setClicked] = useState(false);
+    if (props.latitude && props.longitude) {
+      return (<Marker 
+        coordinate={{ latitude: props.latitude, longitude: props.longitude }} 
+        image={{width: 200, height: 200, uri: "https://picsum.photos/200"}}
+        onPress={() => setClicked(true)}
+      />);
     }
+    return null;
+  }
 
+  const moveUp = () => {
+    setLocation([location[0], location[1] + 0.00001]);
+  }
+  const [mapLoaded, setMapLoaded] = useState(false);
+
+  const [buttonMsg, setButtonMsg] = useState("hello");
+  useEffect(() => {
+    if (mapLoaded) {
+      if (map.current && location) {
+        map.current.animateCamera({
+          center: {
+            latitude: location[0],
+            longitude: location[1]
+          },
+          altitude: 10, 
+          pitch: 90, 
+          heading: 0,
+          zoom: 100
+        }, { duration: 700 });
+        setButtonMsg("world, " + location[1]);
+      } else {
+        setButtonMsg("world2");
+      }
+    } else {
+      setMapLoaded(true);
+    }
+  }, [location])
+
+  const camera: any = {
+    center: {
+      latitude: location[0],
+      longitude: location[1]
+    },
+    altitude: 10, 
+    pitch: 90, 
+    heading: 0,
+    zoom: 100
+  }
+
+  const region: any = {
+    latitude: location[0],
+    longitude: location[1],
+    latitudeDelta: 0.00001,
+    longitudeDelta: 0.00001
+  }
+  if (debugMode) {
+    return (
+      <View style={styles.container}>
+        { errorMsg ? <Text> {errorMsg}</Text> : null }
+        <Button title={"DEBUG MODE:" + buttonMsg} onPress={moveUp}></Button>
+        <MapView 
+          showsBuildings
+          ref={map}
+          style={styles.map} 
+          mapType={"standard"}
+          camera={camera}
+          showsCompass={false}
+        >
+          {campsiteMarkers.map(obj => <CampsiteMarker key={obj.num} num={obj.num} latitude={obj.latitude} longitude={obj.longitude} />)}
+        </MapView>
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
-      { errorMsg ? <Text>{text}</Text> : null }
+      { errorMsg ? <Text>{errorMsg}</Text> : null }
+      <Button title={"LIVE MODE:" + buttonMsg} onPress={moveUp}></Button>
       <MapView 
         showsBuildings
         ref={map}
         style={styles.map} 
-        mapType={"terrain"}
-        region={{
-          latitude: latitude,
-          longitude: longitude,
-          latitudeDelta: 0.001,
-          longitudeDelta: 0.001
-        }}
-        onLayout={() => {
-          setTimeout(() => {
-            if (map && map.current) {
-              map.current.animateCamera({ 
-                center: {
-                    latitude: latitude,
-                    longitude: longitude
-                },
-                pitch: 90, 
-                heading: 0
-              });
-            }
-          }, 1000);
-        }}
+        mapType={"standard"}
+        camera={camera}
+        showsUserLocation={true}
+        showsCompass={false}
+        scrollEnabled={false} 
       >
-          {campsiteMarkers.map(obj => <CampsiteMarker key={obj.num} num={obj.num} latitude={obj.latitude} longitude={obj.longitude} />)}
+        {campsiteMarkers.map(obj => <CampsiteMarker key={obj.num} num={obj.num} latitude={obj.latitude} longitude={obj.longitude} />)}
       </MapView>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
