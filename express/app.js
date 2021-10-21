@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import locationRouter from "./routes/locations.js";
+import locationRouter from "./routes/location.js";
 import indexRouter from "./routes/index.js";
 import cors from "cors";
 
@@ -28,6 +28,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/", indexRouter);
-app.use("/locations", locationRouter);
+app.use("/location", locationRouter);
 
 export default app;
