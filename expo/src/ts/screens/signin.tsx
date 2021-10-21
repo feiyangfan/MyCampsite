@@ -3,7 +3,7 @@ import {StyleSheet, View} from "react-native"
 import {Button, Input, BottomSheet, Divider, Header} from "react-native-elements"
 import {useGoogleSignInPrompt, useUser} from "../lib/auth"
 import {NavigationProp, RouteProp, useNavigation, useRoute} from "@react-navigation/native"
-import {RootStackParamList} from "../../../types"
+import {RootStackParamList} from "../types"
 
 const styles = StyleSheet.create({
     container: {
