@@ -1,15 +1,14 @@
-import {getAuth, onAuthStateChanged, signInWithCredential, AuthCredential, GoogleAuthProvider} from "firebase/auth"
+import {User, getAuth, onAuthStateChanged, signInWithCredential, AuthCredential, GoogleAuthProvider} from "firebase/auth"
 import {useEffect, useState} from "react"
 import * as Google from "expo-auth-session/providers/google"
 import {expoAuthConfig} from "./config"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
 import {RootStackParamList} from "../types"
 
-export const useUser = (shouldNavigate = false) => {
+export const useUser = (): [User | null, boolean] => {
     const auth = getAuth()
     const [ready, setReady] = useState(false)
     const [user, setUser] = useState(auth.currentUser)
-    const {navigate} = useNavigation<NavigationProp<RootStackParamList>>()
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, newUser => {
@@ -23,12 +22,61 @@ export const useUser = (shouldNavigate = false) => {
         return () => unsub()
     }, [])
 
+    return [user, ready]
+}
+
+export enum AuthWallAction {
+    accepted = "accepted",
+    pending = "pending",
+    rejected = "rejected",
+    deferred = "deferred"
+}
+
+export const useAuthWall = (presentImmediately = false): [User | null, AuthWallAction, () => void] => {
+    const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
+    const [user, ready] = useUser()
+    const [presented, setPresented] = useState(false)
+    const [waitForUpdate, setWaitForUpdate] = useState(false)
+    const [deferred, setDeferred] = useState(true)
+    const signedIn = user?.isAnonymous == false
+    let action = AuthWallAction.pending
+    if (ready && !presented) {
+        if (!signedIn) {
+            if (deferred)
+                action = AuthWallAction.deferred
+            else
+                action = AuthWallAction.rejected
+        } else
+            action = AuthWallAction.accepted
+    }
+
+    const present = () => {
+        setPresented(true)
+        if (deferred)
+            setDeferred(false)
+        nav.navigate("SignIn", {
+            complete: (success) => {
+                if (success)
+                    setWaitForUpdate(true)
+                else
+                    setPresented(false)
+            }
+        })
+    }
+
     useEffect(() => {
-        if (ready && shouldNavigate && !user)
-            navigate("SignIn")
+        if (presented && waitForUpdate && signedIn) {
+            setWaitForUpdate(false)
+            setPresented(false)
+        }
     })
 
-    return [user, ready]
+    useEffect(() => {
+        if (presentImmediately)
+            present()
+    }, [])
+
+    return [user, action, present]
 }
 
 const signInFromProvider = (cred: AuthCredential) => {

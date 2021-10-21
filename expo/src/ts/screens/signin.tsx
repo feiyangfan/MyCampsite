@@ -2,7 +2,8 @@ import React, {useEffect} from "react"
 import {StyleSheet, View} from "react-native"
 import {Button, Input, BottomSheet, Divider, Header} from "react-native-elements"
 import {useGoogleSignInPrompt, useUser} from "../lib/auth"
-import {useNavigation} from "@react-navigation/native"
+import {NavigationProp, RouteProp, useNavigation, useRoute} from "@react-navigation/native"
+import {RootStackParamList} from "../../../types"
 
 const styles = StyleSheet.create({
     container: {
@@ -16,13 +17,18 @@ const styles = StyleSheet.create({
 
 const SignIn = () => {
     const [user] = useUser()
+    const signedIn = user?.isAnonymous == false
     const googleSignIn = useGoogleSignInPrompt()
-    const nav = useNavigation()
+    const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
+    const {params} = useRoute<RouteProp<RootStackParamList, "SignIn">>()
 
     useEffect(() => {
-        if (user)
-            nav.goBack()
-    })
+        const unsub = nav.addListener("beforeRemove", () => {
+            console.log(`Dismissing sign in screen, signed in: ${signedIn}`)
+            params?.complete?.(signedIn)
+        })
+        return () => unsub()
+    }, [])
 
     return (
         // This is likely not the right way of doing things but I want a bottom sheet now, fix later
