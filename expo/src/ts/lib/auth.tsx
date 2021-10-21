@@ -3,7 +3,7 @@ import {useEffect, useState} from "react"
 import * as Google from "expo-auth-session/providers/google"
 import {expoAuthConfig} from "./config"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
-import {RootStackParamList} from "../../../types"
+import {RootStackParamList} from "../types"
 
 export const useUser = (shouldNavigate = false) => {
     const auth = getAuth()

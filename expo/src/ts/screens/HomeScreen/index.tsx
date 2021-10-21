@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
-import * as Types from "../../../../types";
-import GuestbookList from "../../../../components/GuestbookList";
+import * as Types from "../../types";
+import GuestbookList from "../../components/GuestbookList";
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   // Dummy info for now; will update later to fetch information from database

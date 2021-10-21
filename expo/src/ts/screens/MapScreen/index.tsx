@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import * as Types from '../../../../types';
+import * as Types from '../../types';
 
 const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
   return (
