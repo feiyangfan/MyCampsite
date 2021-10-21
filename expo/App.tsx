@@ -11,7 +11,7 @@ import GuestbookScreen from "./src/ts/screens/GuestbookScreen";
 import PostScreen from "./src/ts/screens/PostScreen";
 import SignIn from "./src/ts/screens/signin";
 import theme from "./src/ts/lib/theme";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "./src/ts/types";
 
 initializeApp(firebaseConfig);
 
