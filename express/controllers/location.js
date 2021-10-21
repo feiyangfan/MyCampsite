@@ -1,110 +1,112 @@
 import { v4 as uuidv4 } from "uuid";
-
-// Dummy info for now; will update later to fetch information from database
-const locations = [
-  {
-    parkId: 0,
-    name: "High Park",
-    boundary: {
-      latitudeStart: 43.637957715278965,
-      latitudeEnd: 43.65471814272107,
-      longitudeStart: -79.46668117994243,
-      longitudeEnd: -79.46055003243023,
-    },
-    location: {
-      latitude: 43.645377745301744,
-      longitude: -79.46273586305155,
-      radius: -1,
-    },
-    sites: [
-      {
-        siteId: 0,
-        name: "High Park North",
-        latitude: 43.65341893818677,
-        longitude: -79.4651832778902,
-        radius: 200,
-      },
-      {
-        siteId: 1,
-        name: "Grenadier Pond",
-        latitude: 43.6425844920262,
-        longitude: -79.46696053742487,
-        radius: 200,
-      },
-    ],
-  },
-];
+import Site from "../models/Site.js";
+import Park from "../models/Park.js";
 
 // Get all parks
-export const getAllParks = (req, res) => {
-  res.send(locations);
-  console.log(locations);
+export const getAllParks = async (req, res) => {
+  try {
+    const parks = await Park.find();
+    res.json(parks);
+  } catch (err) {
+    res.send(err);
+  }
 };
 
 // Get location of park by parkID
-export const getParkById = (req, res) => {
-  const foundPark = locations.find((park) => park.parkId == req.params.parkId);
-  res.send(foundPark);
+export const getParkById = async (req, res) => {
+  try {
+    const foundPark = await Park.findById(req.params.parkId);
+    res.json(foundPark);
+  } catch (err) {
+    res.sendStatus(400);
+  }
 };
 
 // Add new park
-export const addPark = (req, res) => {
-  const id = uuidv4();
-  const park = {
-    parkId: id,
+export const addPark = async (req, res) => {
+  const newPark = new Park({
+    name: req.body.name,
     boundary: req.body.boundary,
     location: req.body.location,
     sites: [],
-  };
+  });
 
-  locations.push(park);
-  res.send(`Added new park with id ${id}`);
+  try {
+    const savedPark = await newPark.save();
+    res.json(savedPark);
+  } catch (err) {
+    res.sendStatus(400);
+  }
 };
 
 // Delete a park by parkID
-export const deleteParkById = (req, res) => {
-  const index = locations.map((park) => park.parkId).indexOf(req.params.parkId);
-  locations.splice(index, 1);
-  res.send(`Deleted park with id ${req.params.parkId}`);
+export const deleteParkById = async (req, res) => {
+  try {
+    const deletedPark = await Park.deleteOne({ _id: req.params.parkId });
+    res.json(deletedPark);
+  } catch (err) {
+    res.sendStatus(400);
+  }
 };
 
 // Get all sites by parkID
-export const getAllSites = (req, res) => {
-  const foundPark = locations.find((park) => park.parkId == req.params.parkId);
-  res.send(foundPark.sites);
+export const getAllSites = async (req, res) => {
+  try {
+    const foundPark = await Park.findById(req.params.parkId);
+    res.json(foundPark.sites);
+  } catch (err) {
+    res.sendStatus(400);
+  }
 };
 
 // Get location of site by parkID, siteID
-export const getSiteById = (req, res) => {
-  const foundPark = locations.find((park) => park.parkId == req.params.parkId);
-  const foundSite = foundPark.sites.find(
-    (site) => site.siteId == req.params.siteId
-  );
-  res.send(foundSite);
+export const getSiteById = async (req, res) => {
+  try {
+    const foundPark = await Park.findById(req.params.parkId);
+    console.log(foundPark);
+    const foundSite = foundPark.sites.find(
+      (site) => site._id == req.params.siteId
+    ); //TODO: I don't know how to query mongoDB for this
+
+    res.json(foundSite);
+  } catch (err) {
+    res.sendStatus(400);
+  }
 };
 
 // Add new site by parkID
-export const addSite = (req, res) => {
-  const park = locations.find((park) => (park.parkId = req.params.parkId));
-  const id = uuidv4();
-  const newSite = {
-    id: siteId,
-    name: req.params.name,
-    latitude: req.params.latitude,
-    longitude: req.params.longitude,
-    radius: req.params.radius,
-  };
+export const addSite = async (req, res) => {
+  const newSite = new Site({
+    name: req.body.name,
+    location: req.body.location,
+  });
+  console.log(newSite);
 
-  park.sites.push(newSite);
-  res.send(`Added new site with id ${id}`);
+  try {
+    const foundPark = await Park.findById(req.params.parkId);
+    foundPark.sites.push(newSite);
+    foundPark.save();
+    res.json(newSite);
+  } catch (err) {
+    res.sendStatus(400);
+  }
 };
 
 // Delete a site by parkID, siteID
-export const deleteSiteById = (req, res) => {
-  const park = locations.find((park) => (park.parkId = req.params.parkId));
-  const index = park.sites
-    .map((site) => site.siteId)
-    .indexOf(req.params.siteId);
-  park.sites.splice(index, 1);
-  res.send(`Deleted site with id ${req.params.siteId}`);
+export const deleteSiteById = async (req, res) => {
+  try {
+    const foundPark = await Park.findById(req.params.parkId);
+    const index = foundPark.sites
+      .map((site) => site._id.toString())
+      .indexOf(req.params.siteId);
+    if (index < 0) {
+      res.sendStatus(400);
+      return;
+    }
+    foundPark.sites.splice(index, 1);
+    foundPark.save();
+    res.json(200);
+  } catch (err) {
+    res.sendStatus(400);
+  }
 };
