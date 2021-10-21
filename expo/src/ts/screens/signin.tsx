@@ -2,7 +2,7 @@ import React, {useEffect} from "react"
 import {StyleSheet, View} from "react-native"
 import {Button, Input, BottomSheet, Divider, Header} from "react-native-elements"
 import {useGoogleSignInPrompt, useUser} from "../lib/auth"
-import {NavigationProp, RouteProp, useNavigation, useRoute} from "@react-navigation/native"
+import {NavigationProp, useNavigation} from "@react-navigation/native"
 import {RootStackParamList} from "../types"
 
 const styles = StyleSheet.create({
@@ -20,12 +20,10 @@ const SignIn = () => {
     const signedIn = user?.isAnonymous == false
     const googleSignIn = useGoogleSignInPrompt()
     const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
-    const {params} = useRoute<RouteProp<RootStackParamList, "SignIn">>()
 
     useEffect(() => {
         const unsub = nav.addListener("beforeRemove", () => {
             console.log(`Dismissing sign in screen, signed in: ${signedIn}`)
-            params?.complete?.(signedIn)
         })
         return () => unsub()
     }, [])

@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ThemeProvider } from "react-native-elements";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import {Provider} from "react-redux";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./src/ts/lib/config";
 import HomeScreen from "./src/ts/screens/HomeScreen";
@@ -13,20 +14,22 @@ import SignIn from "./src/ts/screens/signin";
 import Me from "./src/ts/screens/me";
 import theme from "./src/ts/lib/theme";
 import { RootStackParamList } from "./src/ts/types";
+import store from "./src/ts/lib/store"
 
 initializeApp(firebaseConfig);
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
-const LayoutProviders = (props: { children: ReactNode }) => (
+const GlobalProviders = (props: { children: ReactNode }) => (
   <SafeAreaProvider>
-    <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
+    </Provider>
   </SafeAreaProvider>
 );
 
+const Stack = createNativeStackNavigator<RootStackParamList>();
 const App = () => {
   return (
-    <LayoutProviders>
+    <GlobalProviders>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home">
           <Stack.Group screenOptions={{headerShown: false}}>
@@ -43,7 +46,7 @@ const App = () => {
           </Stack.Group>
         </Stack.Navigator>
       </NavigationContainer>
-    </LayoutProviders>
+    </GlobalProviders>
   );
 };
 

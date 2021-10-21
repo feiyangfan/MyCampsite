@@ -4,6 +4,7 @@ import * as Google from "expo-auth-session/providers/google"
 import {expoAuthConfig} from "./config"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
 import {RootStackParamList} from "../types"
+import {useRootSelector} from "./store"
 
 export const useUser = (): [User | null, boolean] => {
     const auth = getAuth()
@@ -26,48 +27,37 @@ export const useUser = (): [User | null, boolean] => {
 }
 
 export enum AuthWallAction {
-    accepted = "accepted",
-    pending = "pending",
-    rejected = "rejected",
-    deferred = "deferred"
+    accepted = "accepted",      // signed in
+    pending = "pending",        // authenticating
+    rejected = "rejected",      // sign in refused
+    deferred = "deferred"       // not signed in, auth wall not shown
 }
 
 export const useAuthWall = (presentImmediately = false): [User | null, AuthWallAction, () => void] => {
     const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
     const [user, ready] = useUser()
-    const [presented, setPresented] = useState(false)
-    const [waitForUpdate, setWaitForUpdate] = useState(false)
+    const [action, setAction] = useState(AuthWallAction.pending)
     const [deferred, setDeferred] = useState(true)
-    const signedIn = user?.isAnonymous == false
-    let action = AuthWallAction.pending
-    if (ready && !presented) {
-        if (!signedIn) {
-            if (deferred)
-                action = AuthWallAction.deferred
-            else
-                action = AuthWallAction.rejected
-        } else
-            action = AuthWallAction.accepted
-    }
+    const result = useRootSelector(state => state.authWallResult)
 
     const present = () => {
-        setPresented(true)
-        if (deferred)
-            setDeferred(false)
-        nav.navigate("SignIn", {
-            complete: (success) => {
-                if (success)
-                    setWaitForUpdate(true)
-                else
-                    setPresented(false)
-            }
-        })
+        setAction(AuthWallAction.pending)
+        setDeferred(false)
+        nav.navigate("SignIn")
     }
 
     useEffect(() => {
-        if (presented && waitForUpdate && signedIn) {
-            setWaitForUpdate(false)
-            setPresented(false)
+        if (result.done) {
+            if (result.uid == user?.uid)
+                setAction(AuthWallAction.accepted)
+            else if (!result.uid)
+                setAction(AuthWallAction.rejected)
+        }
+        else if (ready) {
+            if (user)
+                setAction(AuthWallAction.accepted)
+            else if (deferred)
+                setAction(AuthWallAction.deferred)
         }
     })
 
