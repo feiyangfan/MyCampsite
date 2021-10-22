@@ -2,7 +2,10 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import mongoose from "mongoose";
+
+// mongoose and mongo connection
+const { mongoose } = require("./database/mongoose");
+mongoose.set("useFindAndModify", false); // for some deprecation issues
 
 // ES6 code needed for __dirname to work below
 import { fileURLToPath } from "url";
@@ -31,9 +34,5 @@ app.use((req, res, next) => {
 app.use("/", indexRouter);
 app.use("/location", locationRouter);
 
-// FOR TESTING
-mongoose.connect(
-  "mongodb+srv://admin:admin@cluster0.wzta6.mongodb.net/Testing?retryWrites=true&w=majority"
-);
 
 export default app;
