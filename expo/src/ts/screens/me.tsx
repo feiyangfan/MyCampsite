@@ -45,7 +45,7 @@ const Me = () => {
     return (
         <View style={{justifyContent: "center"}}>
             {authWallAction > AuthWallAction.pending && <SignIn />}
-            {authWallAction == AuthWallAction.pending && <ActivityIndicator size="large" />}
+            {authWallAction == AuthWallAction.pending && <ActivityIndicator color="blue" size="large" />}
             {authWallAction == AuthWallAction.accepted &&
                 <View>
                     <Profile id={"XXXXXXXXXXXX"} />
