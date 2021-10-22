@@ -1,25 +1,25 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit"
 import {User} from "firebase/auth"
 
-type AuthWallResponse = {
-    done: boolean
-    uid: User["uid"] | null
-}
-
 const initialState = {
-    authWallResponse: {done: false, uid: null} as AuthWallResponse
+    authWall: {
+        presented: false,
+        uid: null as User["uid"] | null
+    }
 }
 
 const slice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setAuthWallResponse: (state, action: PayloadAction<AuthWallResponse>) => {
-            state.authWallResponse = action.payload
+        presentAuthWall: (state) => {
+            state.authWall.presented = true
+            state.authWall.uid = null
         },
 
-        resetAuthWallResponse: (state) => {
-            state.authWallResponse = initialState.authWallResponse
+        dismissAuthWall: (state, action: PayloadAction<User["uid"] | null>) => {
+            state.authWall.presented = false
+            state.authWall.uid = action.payload
         }
     }
 })

@@ -1,11 +1,10 @@
-import {User, getAuth, onAuthStateChanged, signInWithCredential, AuthCredential, GoogleAuthProvider} from "firebase/auth"
+import {User, getAuth, onAuthStateChanged, signOut as firebaseSignOut, signInWithCredential, AuthCredential, GoogleAuthProvider} from "firebase/auth"
 import {useEffect, useState} from "react"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
 import * as Google from "expo-auth-session/providers/google"
 import {expoAuthConfig} from "../config"
 import {RootStackParamList} from "../../types"
-import {useAppDispatch, useAppSelector} from "../store"
-import authSlice from "./slice"
+import {useAppSelector} from "../store"
 
 /**
  * Current firebase user, user value is only valid when ready is true
@@ -17,9 +16,8 @@ export const useUser = (): [User | null, boolean] => {
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, newUser => {
-            console.log(`Auth state changed: ${newUser?.uid}
-                        anonymous: ${newUser?.isAnonymous}
-                        provider: ${newUser?.providerId}`)
+            console.log(`onAuthStateChanged uid: ${newUser?.uid}, anonymous: ${newUser?.isAnonymous}, ` +
+                        `provider: ${newUser?.providerId}`)
             setUser(newUser)
             if (!ready)
                 setReady(true)
@@ -40,43 +38,44 @@ export enum AuthWallAction {
 /**
  * Hooks current user and auth wall interaction
  * @param presentImmediately present the auth wall right away without needing to call present
+ * @return user: the current firebase user
+ * @return authWallAction: auth wall decision
+ * @return signIn/signOut: present the auth wall or sign out
  */
-export const useAuthWall = (presentImmediately = false): [User | null, AuthWallAction, () => void] => {
+export const useAuthWall = (presentImmediately = false) => {
+    const auth = getAuth()
     const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
     const [user, ready] = useUser()
-    const [action, setAction] = useState(AuthWallAction.pending)
     const [deferred, setDeferred] = useState(true)
-    const result = useAppSelector(state => state.auth.authWallResponse)
-    const dispatch = useAppDispatch()
+    const wall = useAppSelector(state => state.auth.authWall)
 
-    const present = () => {
-        setAction(AuthWallAction.pending)
+    let action = AuthWallAction.pending
+    if (ready && !wall.presented) {
+        if (wall.uid && wall.uid == user?.uid)
+            action = AuthWallAction.accepted
+        else if (user?.isAnonymous == false)
+            action = AuthWallAction.accepted
+        else if (deferred)
+            action = AuthWallAction.deferred
+        else
+            action = AuthWallAction.rejected
+    }
+
+    const signIn = () => {
         setDeferred(false)
-        dispatch(authSlice.actions.resetAuthWallResponse)
         nav.navigate("SignIn")
     }
 
-    useEffect(() => {
-        if (result.done) {
-            if (result.uid == user?.uid)
-                setAction(AuthWallAction.accepted)
-            else if (!result.uid)
-                setAction(AuthWallAction.rejected)
-        }
-        else if (ready) {
-            if (user)
-                setAction(AuthWallAction.accepted)
-            else if (deferred)
-                setAction(AuthWallAction.deferred)
-        }
-    })
+    const signOut = () => {
+        firebaseSignOut(auth)
+    }
 
     useEffect(() => {
         if (presentImmediately)
-            present()
+            signIn()
     }, [])
 
-    return [user, action, present]
+    return {user, authWallAction: action, signIn, signOut}
 }
 
 const signInFromProvider = (cred: AuthCredential) => {

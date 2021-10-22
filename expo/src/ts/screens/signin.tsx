@@ -24,10 +24,14 @@ const SignIn = () => {
     const dispatch = useAppDispatch()
 
     useEffect(() => {
+        dispatch(authSlice.actions.presentAuthWall())
+    }, [])
+
+    useEffect(() => {
         const unsub = nav.addListener("beforeRemove", () => {
             const uid = user?.uid ?? null // there's undefined and null
             console.log(`Dismissing sign in screen, uid: ${uid}`)
-            dispatch(authSlice.actions.setAuthWallResponse({done: true, uid}))
+            dispatch(authSlice.actions.dismissAuthWall(uid))
         })
         return () => unsub()
     }, [])

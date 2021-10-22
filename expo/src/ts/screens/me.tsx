@@ -4,13 +4,14 @@ import {useAuthWall} from "../lib/auth"
 import {Button, Text} from "react-native-elements"
 
 const Me = () => {
-    const [user, authWallAction, authWall] = useAuthWall()
+    const {user, authWallAction, signIn, signOut} = useAuthWall()
 
     return (
         <View>
             <Text>User ID: {user?.uid}</Text>
             <Text>Auth wall action: {authWallAction}</Text>
-            <Button title="Sign In" onPress={() => authWall()} />
+            <Button title="Sign In" onPress={() => signIn()} />
+            <Button title="Sign Out" onPress={() => signOut()} />
         </View>
     )
 }
