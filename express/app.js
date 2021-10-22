@@ -39,12 +39,10 @@ app.use("/location", locationRouter);
 /* Connect to our database */
 // Get the URI of the local database, or the one specified on deployment.
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/301project'
-
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true})
+mongoose.connect(mongoURI)
 .catch((error) => {
     console.log('Error connecting to mongodb. Timeout reached.', error);
   });
-mongoose.set("useFindAndModify", false); // for some deprecation issues
 
 // middleware for mongo connection error for routes that need it
 const mongoChecker = (req, res, next) => {
