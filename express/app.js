@@ -3,6 +3,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 
+require('dotenv').config()
 // mongoose and mongo connection
 const { mongoose } = require("./database/mongoose");
 mongoose.set("useFindAndModify", false); // for some deprecation issues
@@ -33,6 +34,9 @@ app.use((req, res, next) => {
 });
 app.use("/", indexRouter);
 app.use("/location", locationRouter);
+
+// to validate object IDs
+const { ObjectID } = require("mongodb");
 
 // middleware for mongo connection error for routes that need it
 const mongoChecker = (req, res, next) => {
