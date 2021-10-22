@@ -3,11 +3,11 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 
+// only for dev purpose, can be removed later 
 import dotenv from 'dotenv'
 dotenv.config()
 
-import { mongoose } from "./database/mongoose";
-mongoose.set("useFindAndModify", false); // for some deprecation issues
+import mongoose from 'mongoose';
 
 // ES6 code needed for __dirname to work below
 import { fileURLToPath } from "url";
@@ -36,6 +36,15 @@ app.use((req, res, next) => {
 app.use("/", indexRouter);
 app.use("/location", locationRouter);
 
+/* Connect to our database */
+// Get the URI of the local database, or the one specified on deployment.
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/301project'
+
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true})
+.catch((error) => {
+    console.log('Error connecting to mongodb. Timeout reached.', error);
+  });
+mongoose.set("useFindAndModify", false); // for some deprecation issues
 
 // middleware for mongo connection error for routes that need it
 const mongoChecker = (req, res, next) => {
