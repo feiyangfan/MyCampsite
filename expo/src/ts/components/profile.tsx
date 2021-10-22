@@ -1,15 +1,21 @@
 import React from "react"
 import {View} from "react-native"
-import {Avatar, Text} from "react-native-elements"
-import {User} from "firebase/auth"
+import {Avatar, Card, Text} from "react-native-elements"
+import {useAuthWall} from "../lib/auth"
 
-const Profile = (props: {user: User}) => {
+const Profile = (props: {id: string}) => {
+    const {user} = useAuthWall()
+
     return (
-        <View style={{alignItems: "center"}}>
-            <Avatar size="large" rounded title="ME" />
-            <Text h4>{props.user.displayName}</Text>
-            {props.user.email && <Text>{props.user.email}</Text>}
-        </View>
+        <Card>
+            <View style={{flexDirection: "row"}}>
+                <Avatar size="large" title="ME" />
+                <View style={{justifyContent: "space-evenly"}}>
+                    <Text>Name</Text>
+                    <Text>Email</Text>
+                </View>
+            </View>
+        </Card>
     )
 }
 export default Profile
