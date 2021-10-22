@@ -37,8 +37,7 @@ app.use("/location", locationRouter);
 
 // FOR TESTING
 mongoose.connect(
-  "mongodb+srv://admin:admin@cluster0.wzta6.mongodb.net/Testing?retryWrites=true&w=majority",
-  () => console.log("Connected to DB!")
+  "mongodb+srv://admin:admin@cluster0.wzta6.mongodb.net/Testing?retryWrites=true&w=majority"
 );
 
 export default app;
