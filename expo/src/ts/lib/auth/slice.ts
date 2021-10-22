@@ -2,10 +2,8 @@ import {createSlice, PayloadAction} from "@reduxjs/toolkit"
 import {User} from "firebase/auth"
 
 const initialState = {
-    authWall: {
-        presented: false,
-        uid: null as User["uid"] | null
-    }
+    authWallActive: false,
+    requiredUID: null as User["uid"] | null
 }
 
 const slice = createSlice({
@@ -13,13 +11,17 @@ const slice = createSlice({
     initialState,
     reducers: {
         presentAuthWall: (state) => {
-            state.authWall.presented = true
-            state.authWall.uid = null
+            state.authWallActive = true
+            state.requiredUID = null
         },
 
         dismissAuthWall: (state, action: PayloadAction<User["uid"] | null>) => {
-            state.authWall.presented = false
-            state.authWall.uid = action.payload
+            state.authWallActive = false
+            state.requiredUID = action.payload
+        },
+
+        signOut: (state) => {
+            state.requiredUID = null
         }
     }
 })

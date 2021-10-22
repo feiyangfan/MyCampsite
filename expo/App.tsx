@@ -12,7 +12,7 @@ import GuestbookScreen from "./src/ts/screens/GuestbookScreen";
 import PostScreen from "./src/ts/screens/PostScreen";
 import SignIn from "./src/ts/screens/signin";
 import Me from "./src/ts/screens/me";
-import theme from "./src/ts/lib/theme";
+import {theme} from "./src/ts/lib/theme";
 import { RootStackParamList } from "./src/ts/types";
 import store from "./src/ts/lib/store"
 
@@ -38,7 +38,7 @@ const App = () => {
             <Stack.Screen name="Guestbook" component={GuestbookScreen} />
             <Stack.Screen name="Post" component={PostScreen} />
           </Stack.Group>
-          <Stack.Group screenOptions={{presentation: "transparentModal"}}>
+          <Stack.Group screenOptions={{presentation: "modal"}}>
             <Stack.Screen name="SignIn" component={SignIn} />
           </Stack.Group>
           <Stack.Group screenOptions={{presentation: "modal"}}>

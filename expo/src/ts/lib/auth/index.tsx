@@ -4,7 +4,8 @@ import {NavigationProp, useNavigation} from "@react-navigation/native"
 import * as Google from "expo-auth-session/providers/google"
 import {expoAuthConfig} from "../config"
 import {RootStackParamList} from "../../types"
-import {useAppSelector} from "../store"
+import {useAppDispatch, useAppSelector} from "../store"
+import authSlice from "./slice"
 
 /**
  * Current firebase user, user value is only valid when ready is true
@@ -47,11 +48,12 @@ export const useAuthWall = (presentImmediately = false) => {
     const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
     const [user, ready] = useUser()
     const [deferred, setDeferred] = useState(true)
-    const wall = useAppSelector(state => state.auth.authWall)
+    const state = useAppSelector(state => state.auth)
+    const dispatch = useAppDispatch()
 
     let action = AuthWallAction.pending
-    if (ready && !wall.presented) {
-        if (wall.uid && wall.uid == user?.uid)
+    if (ready && !state.authWallActive) {
+        if (state.requiredUID && state.requiredUID == user?.uid)
             action = AuthWallAction.accepted
         else if (user?.isAnonymous == false)
             action = AuthWallAction.accepted
@@ -68,6 +70,7 @@ export const useAuthWall = (presentImmediately = false) => {
 
     const signOut = () => {
         firebaseSignOut(auth)
+        dispatch(authSlice.actions.signOut())
     }
 
     useEffect(() => {

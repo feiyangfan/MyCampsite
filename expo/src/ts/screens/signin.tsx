@@ -1,21 +1,11 @@
 import React, {useEffect} from "react"
-import {StyleSheet, View} from "react-native"
-import {Button, Input, BottomSheet, Divider, Header} from "react-native-elements"
+import {View} from "react-native"
+import {Button, Input, Card} from "react-native-elements"
 import {useGoogleSignInPrompt, useUser} from "../lib/auth"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
 import {RootStackParamList} from "../types"
 import {useAppDispatch} from "../lib/store"
 import authSlice from "../lib/auth/slice"
-
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "white",
-        flexDirection: "column",
-        justifyContent: "space-evenly",
-        padding: 5,
-        paddingTop: 15
-    }
-})
 
 const SignIn = () => {
     const [user] = useUser()
@@ -36,25 +26,28 @@ const SignIn = () => {
         return () => unsub()
     }, [])
 
+    useEffect(() => {
+        if (user?.isAnonymous == false)
+            nav.goBack()
+    })
+
     return (
-        // This is likely not the right way of doing things but I want a bottom sheet now, fix later
-        <BottomSheet isVisible>
-            <Header
-                centerComponent={{text: "Sign in to continue"}}
-                rightComponent={{text: "Cancel", onPress: () => nav.goBack()}}
-            />
-            <View style={styles.container}>
-                <View style={styles.container}>
-                    <Input placeholder="Email" />
-                    <Input placeholder="Password" secureTextEntry />
-                </View>
-                <Divider subHeader="Or" />
-                <View style={styles.container}>
+        <View>
+            <Card>
+                <Card.Title>Sign In with Email</Card.Title>
+                <Card.Divider />
+                <Input placeholder="Email" />
+                <Input placeholder="Password" secureTextEntry />
+            </Card>
+            <Card>
+                <Card.Title>Or</Card.Title>
+                <Card.Divider />
+                <View style={{height: 100, justifyContent: "space-between"}}>
                     <Button title="Sign In with Google" onPress={() => googleSignIn()} />
                     <Button title="Sign In with Facebook" onPress={() => {}} />
                 </View>
-            </View>
-        </BottomSheet>
+            </Card>
+        </View>
     )
 }
 export default SignIn

@@ -1,17 +1,44 @@
 import React from "react"
-import {View} from "react-native"
-import {useAuthWall} from "../lib/auth"
-import {Button, Text} from "react-native-elements"
+import {ActivityIndicator, View} from "react-native"
+import {Button, Card, Text} from "react-native-elements"
+import {AuthWallAction, useAuthWall} from "../lib/auth"
 
-const Me = () => {
-    const {user, authWallAction, signIn, signOut} = useAuthWall()
+const SignIn = () => {
+    const {signIn} = useAuthWall()
 
     return (
-        <View>
-            <Text>User ID: {user?.uid}</Text>
-            <Text>Auth wall action: {authWallAction}</Text>
+        <Card>
+            <Card.Title>You are signed out</Card.Title>
+            <Text>Sign in to do stuff</Text>
+            <Card.Divider />
             <Button title="Sign In" onPress={() => signIn()} />
+        </Card>
+    )
+}
+
+const SignOut = () => {
+    const {signOut} = useAuthWall()
+
+    return (
+        <View style={{paddingLeft: 15, paddingRight: 15}}>
             <Button title="Sign Out" onPress={() => signOut()} />
+        </View>
+    )
+}
+
+const Me = () => {
+    const {authWallAction} = useAuthWall()
+
+    return (
+        <View style={{alignItems: "stretch", justifyContent: "center"}}>
+            {authWallAction > AuthWallAction.pending && <SignIn />}
+            {authWallAction == AuthWallAction.pending && <ActivityIndicator size="large" />}
+            {authWallAction == AuthWallAction.accepted &&
+                <View>
+                    <Text>profile here</Text>
+                    <SignOut />
+                </View>
+            }
         </View>
     )
 }
