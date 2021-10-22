@@ -9,6 +9,8 @@ dotenv.config()
 
 import mongoose from 'mongoose';
 
+import {mongoChecker} from "./database/middleware";
+
 // ES6 code needed for __dirname to work below
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
@@ -40,26 +42,5 @@ app.use("/location", locationRouter);
 // Get the URI of the local database, or the one specified on deployment.
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/301project'
 mongoose.connect(mongoURI);
-
-// middleware for mongo connection error for routes that need it
-const mongoChecker = (req, res, next) => {
-  // check mongoose connection established.
-  if (mongoose.connection.readyState != 1) {
-    log("Issue with mongoose connection");
-    res.status(500).send("Internal server error");
-    return;
-  } else {
-    next();
-  }
-};
-
-// checks for first error returned by promise rejection if Mongo database suddenly disconnects
-const isMongoError = (error) => {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    error.name === "MongoNetworkError"
-  );
-}
 
 export default app;
