@@ -9,4 +9,4 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true, us
     console.log('Error connecting to mongodb. Timeout reached.', error);
   });
 
-module.exports = { mongoose }  // Export the active connection. 
+export const mongoose = mongoose; // Export the active connection. 
