@@ -2,11 +2,7 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-
-require('dotenv').config()
-// mongoose and mongo connection
-const { mongoose } = require("./database/mongoose");
-mongoose.set("useFindAndModify", false); // for some deprecation issues
+import mongoose from "mongoose";
 
 // ES6 code needed for __dirname to work below
 import { fileURLToPath } from "url";
