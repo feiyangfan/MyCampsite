@@ -12,6 +12,7 @@ export type RootStackParamList = {
   Post: {
     post: any;
   };
+  Me: undefined;
 };
 
 type HomeScreenNavigationProp = NativeStackScreenProps<
