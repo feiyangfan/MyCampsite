@@ -35,28 +35,10 @@ app.use((req, res, next) => {
 app.use("/", indexRouter);
 app.use("/location", locationRouter);
 
-// to validate object IDs
-const { ObjectID } = require("mongodb");
-
-// middleware for mongo connection error for routes that need it
-const mongoChecker = (req, res, next) => {
-  // check mongoose connection established.
-  if (mongoose.connection.readyState != 1) {
-    log("Issue with mongoose connection");
-    res.status(500).send("Internal server error");
-    return;
-  } else {
-    next();
-  }
-};
-
-// checks for first error returned by promise rejection if Mongo database suddenly disconnects
-const isMongoError = (error) => {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    error.name === "MongoNetworkError"
-  );
-}
+// FOR TESTING
+mongoose.connect(
+  "mongodb+srv://admin:admin@cluster0.wzta6.mongodb.net/Testing?retryWrites=true&w=majority",
+  () => console.log("Connected to DB!")
+);
 
 export default app;
