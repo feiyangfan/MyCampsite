@@ -6,7 +6,7 @@ import logger from "morgan";
 import dotenv from 'dotenv'
 dotenv.config()
 
-import { mongoose } from "./db/mongoose";
+import { mongoose } from "./database/mongoose";
 mongoose.set("useFindAndModify", false); // for some deprecation issues
 
 // ES6 code needed for __dirname to work below
