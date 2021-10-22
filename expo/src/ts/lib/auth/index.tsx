@@ -1,11 +1,15 @@
 import {User, getAuth, onAuthStateChanged, signInWithCredential, AuthCredential, GoogleAuthProvider} from "firebase/auth"
 import {useEffect, useState} from "react"
-import * as Google from "expo-auth-session/providers/google"
-import {expoAuthConfig} from "./config"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
-import {RootStackParamList} from "../types"
-import {useRootSelector} from "./store"
+import * as Google from "expo-auth-session/providers/google"
+import {expoAuthConfig} from "../config"
+import {RootStackParamList} from "../../types"
+import {useAppDispatch, useAppSelector} from "../store"
+import authSlice from "./slice"
 
+/**
+ * Current firebase user, user value is only valid when ready is true
+ */
 export const useUser = (): [User | null, boolean] => {
     const auth = getAuth()
     const [ready, setReady] = useState(false)
@@ -27,22 +31,28 @@ export const useUser = (): [User | null, boolean] => {
 }
 
 export enum AuthWallAction {
-    accepted = "accepted",      // signed in
-    pending = "pending",        // authenticating
-    rejected = "rejected",      // sign in refused
-    deferred = "deferred"       // not signed in, auth wall not shown
+    accepted,      // signed in
+    pending,       // authenticating
+    rejected,      // sign in refused
+    deferred       // not signed in, auth wall not shown
 }
 
+/**
+ * Hooks current user and auth wall interaction
+ * @param presentImmediately present the auth wall right away without needing to call present
+ */
 export const useAuthWall = (presentImmediately = false): [User | null, AuthWallAction, () => void] => {
     const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
     const [user, ready] = useUser()
     const [action, setAction] = useState(AuthWallAction.pending)
     const [deferred, setDeferred] = useState(true)
-    const result = useRootSelector(state => state.authWallResult)
+    const result = useAppSelector(state => state.auth.authWallResponse)
+    const dispatch = useAppDispatch()
 
     const present = () => {
         setAction(AuthWallAction.pending)
         setDeferred(false)
+        dispatch(authSlice.actions.resetAuthWallResponse)
         nav.navigate("SignIn")
     }
 

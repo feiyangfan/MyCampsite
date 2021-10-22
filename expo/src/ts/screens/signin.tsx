@@ -4,6 +4,8 @@ import {Button, Input, BottomSheet, Divider, Header} from "react-native-elements
 import {useGoogleSignInPrompt, useUser} from "../lib/auth"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
 import {RootStackParamList} from "../types"
+import {useAppDispatch} from "../lib/store"
+import authSlice from "../lib/auth/slice"
 
 const styles = StyleSheet.create({
     container: {
@@ -17,13 +19,15 @@ const styles = StyleSheet.create({
 
 const SignIn = () => {
     const [user] = useUser()
-    const signedIn = user?.isAnonymous == false
     const googleSignIn = useGoogleSignInPrompt()
     const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
         const unsub = nav.addListener("beforeRemove", () => {
-            console.log(`Dismissing sign in screen, signed in: ${signedIn}`)
+            const uid = user?.uid ?? null // there's undefined and null
+            console.log(`Dismissing sign in screen, uid: ${uid}`)
+            dispatch(authSlice.actions.setAuthWallResponse({done: true, uid}))
         })
         return () => unsub()
     }, [])
