@@ -5,7 +5,7 @@ import {Text, Button} from "react-native-elements";
 import * as Location from 'expo-location';
 import * as Types from '../../types';
 import MapCampsiteMarker from '../../components/MapCampsiteMarker';
-import mapStyle from './map_style';
+import mapStyle from '../../lib/map_style';
 import {ExpoWebGLRenderingContext, GLView} from 'expo-gl';
 import ExpoTHREE, {THREE} from 'expo-three';
 // import {Magnetometer} from 'expo-sensors';
