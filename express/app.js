@@ -9,7 +9,7 @@ dotenv.config()
 
 import mongoose from 'mongoose';
 
-import {mongoChecker, isMongoError} from "./database/middleware";
+import {mongoChecker, isMongoError} from "./database/middleware.js";
 
 // ES6 code needed for __dirname to work below
 import { fileURLToPath } from "url";
