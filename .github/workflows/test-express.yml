@@ -1,0 +1,21 @@
+name: Test Express App
+
+on:
+  push:
+    paths:
+      - "express/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: express
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install
+        run: npm install
+
+      - name: Test
+        run: npm run test
