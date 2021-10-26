@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {View, StyleSheet, Dimensions, AppState} from 'react-native';
-import MapView, { Camera, PROVIDER_GOOGLE }  from 'react-native-maps';
+import {View, StyleSheet, Dimensions} from 'react-native';
+import MapView, {Camera, PROVIDER_GOOGLE}  from 'react-native-maps';
 import {Text, Button} from "react-native-elements";
 import * as Location from 'expo-location';
 import * as Types from '../../../../types';
@@ -8,6 +8,7 @@ import MapCampsiteMarker from '../../components/MapCampsiteMarker';
 import mapStyle from './map_style';
 import {ExpoWebGLRenderingContext, GLView} from 'expo-gl';
 import ExpoTHREE, {THREE} from 'expo-three';
+// import {Magnetometer} from 'expo-sensors';
 
 const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
   const [location, setLocation] = useState<number[]>([45.39174144302487, -79.21459743503355]);
@@ -33,7 +34,39 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
     return () => clearTimeout(timeout);
   }, []);
 
-  const debugMode = false;
+  // magnometer
+  // const [subscription, setSubscription] = useState<any>(null);
+  // const _subscribe = () => {
+  //     setSubscription(
+  //       Magnetometer.addListener(data => {
+  //         let x = data.x;
+  //         let y = data.y;
+  //         let theta = Math.atan2(y, x);
+  //         if (theta > 2 * Math.PI) {
+  //           theta -= 2 * Math.PI;
+  //         }
+  //         if (theta < 0) {
+  //           theta += 2 * Math.PI;
+  //         }
+  //         appState.current.user.heading = theta;
+  //       })
+  //     );
+  //     _setInterval();
+  // };
+
+  // const _setInterval = () => {
+  //   Magnetometer.setUpdateInterval(77);
+  // };
+  
+  // const _unsubscribe = () => {
+  //   subscription && subscription.remove();
+  //   setSubscription(null);
+  // };
+
+  // useEffect(() => {
+  //   _subscribe();
+  //   return () => _unsubscribe();
+  // }, []);
   
   // load random campsites near arrowhead
   useEffect(() => {
@@ -55,22 +88,28 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
             longitude: location[1],
           },
           altitude: 0.001, 
-          pitch: 90, 
+          pitch: 89.999, 
           heading: 0,
           zoom: 20
         }, { duration: 700 });
       }
+      onMapPress();
     }
   }, [mapLoaded, location])
 
-  const storage: Camera = {
-    pitch: 0,
-    zoom: 0,
-    heading: 0,
-    altitude: 0,
-    center: {
-      latitude: 0,
-      longitude: 0
+  const storage: any = {
+    camera: {
+      pitch: 0,
+      zoom: 0,
+      heading: 0,
+      altitude: 0,
+      center: {
+        latitude: 0,
+        longitude: 0
+      }
+    },
+    user: {
+      heading: 0
     }
   }
   const appState = useRef(storage);
@@ -78,7 +117,7 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
   const onMapPress = async () => {
     if (map.current) {
       let camera: Camera = await map.current.getCamera();
-      appState.current = camera;
+      appState.current.camera = camera;
     }
   }
 
@@ -93,30 +132,11 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
       setUserLocation([location.coords.latitude, location.coords.longitude]);
     })();
   }, []);
-
-  if (debugMode) {
-    return (
-      <View style={styles.container}>
-        { errorMsg ? <Text> {errorMsg}</Text> : null }
-        <Button title={"DEBUG MODE:" + buttonMsg} onPress={moveUp}></Button>
-        <MapView 
-          showsBuildings
-          ref={map}
-          style={styles.map} 
-          mapType={"standard"}
-          camera={camera}
-          showsCompass={false}
-        >
-          {campsiteMarkers.map(obj => <MapCampsiteMarker key={obj.num} num={obj.num} latitude={obj.latitude} longitude={obj.longitude} />)}
-        </MapView>
-      </View>
-    );
-  }
   
   return (
     <View style={styles.container}>
       { errorMsg ? <Text>{errorMsg}</Text> : null }
-      <Button title={"LIVE MODE:" + buttonMsg} onPress={moveUp}></Button>
+      {/* <Button title={"LIVE MODE:" + buttonMsg} onPress={moveUp}></Button> */}
       <View style={styles.overlay} pointerEvents={'none'}>
         <GLView
           style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height }}
@@ -124,9 +144,6 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
             const renderer = new ExpoTHREE.Renderer({ gl });
             renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
             const _scene = new THREE.Scene(); 
-            const sceneColor = 0x6ad6f0;
-            _scene.fog = new THREE.Fog(sceneColor, 1, 10000);
-            _scene.add(new THREE.GridHelper(10, 10));
             
             // load model
             const model = {
@@ -135,7 +152,8 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
 
             const gltf = await ExpoTHREE.loadAsync(model['robot.glb']);
             const object = gltf.scene;
-            ExpoTHREE.utils.scaleLongestSideToSize(object, 3);
+            ExpoTHREE.utils.scaleLongestSideToSize(object, 4);
+            object.position.set(0, -10, 0);
             _scene.add(object);
 
             const _camera = new THREE.PerspectiveCamera(75, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.1, 1000);   
@@ -148,20 +166,23 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
             light.position.z = 5;
             _scene.add(light);
 
+            const yaxis = new THREE.Vector3(0, 1, 0);
+
             const render = () => {
               timeout = requestAnimationFrame(render);
               if (appState.current) {
-                let r = Math.max(20 - appState.current.zoom, 0) * 10;
-                let theta = THREE.MathUtils.degToRad(appState.current.pitch);
-                let phi = THREE.MathUtils.degToRad(appState.current.heading);
+                let r = Math.max(20 - appState.current.camera.zoom, 0) * 15;
+                // add fractional pitch when zero to prevent gimbal lock
+                let theta = THREE.MathUtils.degToRad(appState.current.camera.pitch + (appState.current.camera.pitch === 0 ? .0001 : 0));
+                let phi = THREE.MathUtils.degToRad(appState.current.camera.heading);
                 // basic trig to get camera position
                 _camera.position.set(r * Math.sin(theta) * Math.cos(phi), r * Math.cos(theta), r * Math.sin(theta) * Math.sin(phi));
+                // set object to match DeviceMotion heading
+                // object.setRotationFromAxisAngle(yaxis, appState.current.user.heading);
               } else {
                 _camera.position.set(0, 10, 0);
               }
-              _camera.lookAt(object.position);
-              setButtonMsg("camera1 " + appState.current.heading);
-              
+              _camera.lookAt(object.position);  
               renderer.render(_scene, _camera);
               gl.endFrameEXP();
             };
@@ -190,7 +211,7 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
         loadingIndicatorColor={"#606060"}
         loadingBackgroundColor={"#FFFFFF"}
         minZoomLevel={15}
-        maxZoomLevel={18}
+        maxZoomLevel={19}
       >
         {campsiteMarkers.map(obj => <MapCampsiteMarker key={obj.num} num={obj.num} latitude={obj.latitude} longitude={obj.longitude} />)}
       </MapView>
