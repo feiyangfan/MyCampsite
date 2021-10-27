@@ -2,13 +2,9 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-
-import dotenv from 'dotenv'
-dotenv.config()
-
 import mongoose from 'mongoose';
-
 import {mongoChecker, isMongoError} from "./database/middleware.js";
+import "./lib/config.js";
 
 // ES6 code needed for __dirname to work below
 import { fileURLToPath } from "url";
