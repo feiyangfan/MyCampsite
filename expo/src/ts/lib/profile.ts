@@ -18,7 +18,7 @@ export const useProfile = (id?: string): [(PublicProfile | null), boolean] => {
             .then(res => setProfile(res))
             .then(() => setValid(true))
             .catch(error => console.error(error))
-    })
+    }, []) // TODO maybe use a debouncer instead
 
     return [profile, valid]
 }
