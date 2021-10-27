@@ -72,6 +72,12 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
         onGuestbookSelect={onGuestbookSelect}
       />
       <View style={styles.btnWrapper}>
+      <TouchableOpacity
+          style={styles.btn}
+          onPress={() => navigation.navigate("Record")}
+        >
+          <Text style={styles.btnText}>Go to Camera</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.btn}
           onPress={() => navigation.navigate("Map")}

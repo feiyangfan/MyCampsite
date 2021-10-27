@@ -15,6 +15,7 @@ import Me from "./src/ts/screens/me";
 import {theme} from "./src/ts/lib/theme";
 import { RootStackParamList } from "./src/ts/types";
 import store from "./src/ts/lib/store"
+import RecordScreen from "./src/ts/screens/RecordScreen";
 
 initializeApp(firebaseConfig);
 
@@ -37,6 +38,7 @@ const App = () => {
             <Stack.Screen name="Map" component={MapScreen} />
             <Stack.Screen name="Guestbook" component={GuestbookScreen} />
             <Stack.Screen name="Post" component={PostScreen} />
+            <Stack.Screen name="Record" component={RecordScreen} />
           </Stack.Group>
           <Stack.Group screenOptions={{presentation: "modal"}}>
             <Stack.Screen name="SignIn" component={SignIn} />
