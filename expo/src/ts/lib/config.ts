@@ -1,8 +1,11 @@
 import {releaseChannel} from "expo-updates"
 
+let baseURL = "http://10.0.2.2:3000"
+if (releaseChannel.startsWith("prod"))
+    baseURL = ""
 export const env = {
     releaseChannel,
-    // baseURL:
+    baseURL
 }
 
 export const firebaseConfig = {
