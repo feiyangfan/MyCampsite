@@ -11,14 +11,12 @@ import {
   deleteSiteById,
 } from "../controllers/location.js";
 
-import {authenticate} from "../controllers/googlecloud.js";
-
 const router = express.Router();
 
 // Park information
 
 // Get all park locations
-router.get("/", authenticate, getAllParks);
+router.get("/", getAllParks);
 
 // Get location of park by ID
 router.get("/:parkId/", getParkById);
