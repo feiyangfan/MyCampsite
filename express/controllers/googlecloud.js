@@ -18,7 +18,11 @@ export const authenticate = async (req, res, next) => {
     }
     else
         req.auth = null;
-        
-    console.log("ye boi: " + req.auth.toString());
+    if (req.auth) {
+        console.log("ye boi: " + req.auth.toString());
+    } else {
+        console.log("REQ AUTH IS NULL");
+    }
+    
     next();
 };
