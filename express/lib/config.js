@@ -3,9 +3,7 @@ import {cert} from "firebase-admin/app";
 
 dotenv.config();
 
-const firebaseConfig = {
-    credential: ''
-};
+const firebaseConfig = {};
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     firebaseConfig.credential = cert(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 }
