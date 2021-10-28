@@ -2,7 +2,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
   Home: undefined;
-  Map: undefined;
+  Map: {
+    ignoreDeviceLocation: boolean;
+  };
   SignIn: undefined;
   Guestbook: {
     locationId: any;

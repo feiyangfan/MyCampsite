@@ -116,10 +116,12 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       <View style={styles.mainCard}>
         <Text style={styles.text}>Guestbooks near you:</Text>
         <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
-        <View style={styles.btnWrapper}>
-          <TouchableOpacity onPress={() => navigation.navigate('Map')}>
-            <Text style={styles.btnText}>Go to Map</Text>
-          </TouchableOpacity>
+        <View style={styles.loginWrapper}>
+          <Button
+            style={styles.loginBtn}
+            title="View Map"
+            onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: true})}
+          />
         </View>
         <View style={styles.loginWrapper}>
           <Button
@@ -156,17 +158,6 @@ const styles = StyleSheet.create({
     marginTop: 40,
     textAlign: 'left',
     color: 'white',
-  },
-  btnWrapper: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    marginLeft: 10,
-  },
-  btnText: {
-    textAlign: 'center',
-    color: 'white',
-    fontSize: 20,
   },
   mainCard: {
     backgroundColor: '#005131',
