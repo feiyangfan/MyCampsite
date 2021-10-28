@@ -106,6 +106,14 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   //   return () => _unsubscribe();
   // }, []);
 
+  const moveToGuestbook = (siteId: any, siteName: string) => {
+    navigation.navigate('Guestbook', { 
+      locationId: siteId,
+      locationName: siteName,
+      posts: []
+    });
+  }
+
   const moveUp = () => {
     setLocation([location[0], location[1] + 0.00001]);
   }
@@ -232,7 +240,7 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
         minZoomLevel={15}
         maxZoomLevel={19}
       >
-        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} />)}
+        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} moveToGuestbook={moveToGuestbook} />)}
       </MapView>
     </View>
   )
