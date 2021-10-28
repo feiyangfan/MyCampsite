@@ -6,13 +6,13 @@ import * as geolib from 'geolib';
 
 import * as Types from '../../types';
 import GuestbookList from '../../components/GuestbookList';
-import AppHeader from '../../components/AppHeader';
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   const locationURL = 'http://mycampsite-team12.herokuapp.com/location';
   const [nearbySites, setNearbySites] = useState<any[]>([]);
   const [allSites, setAllSites] = useState<any[]>([]);
   const [userLocation, setUserLocation] = useState<number[]>([]);
+  const [nearestParkId, setNearestParkId] = useState();
   const [subscription, setSubscription] = useState<any>();
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -73,6 +73,11 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       return inLatitude && inLongitude;
     });
 
+    // Store nearest park
+    try {
+      setNearestParkId(parkArray[0]._id);
+    } catch (err) {}
+
     // Store sites from current list of parks (in case there is more than one):
     const sites: any[] = [];
     parkArray.map((park) => sites.push(...park.sites));
@@ -115,6 +120,18 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
           <TouchableOpacity onPress={() => navigation.navigate('Map')}>
             <Text style={styles.btnText}>Go to Map</Text>
           </TouchableOpacity>
+        </View>
+        <View style={styles.loginWrapper}>
+          <Button
+            style={styles.loginBtn}
+            title="Add New Site"
+            onPress={() =>
+              navigation.navigate('AddSite', {
+                location: userLocation,
+                parkId: nearestParkId,
+              })
+            }
+          />
         </View>
         <View style={styles.loginWrapper}>
           <Button style={styles.loginBtn} title="My Account" onPress={() => navigation.navigate('Me')} />
@@ -162,6 +179,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     padding: 10,
   },
+
   loginWrapper: {
     alignItems: 'center',
   },

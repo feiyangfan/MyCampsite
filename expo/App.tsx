@@ -10,6 +10,7 @@ import HomeScreen from './src/ts/screens/HomeScreen';
 import MapScreen from './src/ts/screens/MapScreen';
 import GuestbookScreen from './src/ts/screens/GuestbookScreen';
 import PostScreen from './src/ts/screens/PostScreen';
+import AddSiteScreen from './src/ts/screens/AddSiteScreen';
 import SignIn from './src/ts/screens/signin';
 import Me from './src/ts/screens/me';
 import { theme } from './src/ts/lib/theme';
@@ -31,19 +32,20 @@ const App = () => {
   return (
     <GlobalProviders>
       <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Home"
-          screenOptions={{
-            title: 'My Campsite',
-            headerStyle: { backgroundColor: '#00AB67' },
-            headerTintColor: '#fff',
-            headerTitleStyle: { fontSize: 25, fontWeight: 'bold' },
-          }}>
-          <Stack.Group screenOptions={{ headerShown: true }}>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Group
+            screenOptions={{
+              headerShown: true,
+              title: 'My Campsite',
+              headerStyle: { backgroundColor: '#00AB67' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontSize: 25, fontWeight: 'bold' },
+            }}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Map" component={MapScreen} />
             <Stack.Screen name="Guestbook" component={GuestbookScreen} />
             <Stack.Screen name="Post" component={PostScreen} />
+            <Stack.Screen name="AddSite" component={AddSiteScreen} />
           </Stack.Group>
           <Stack.Group screenOptions={{ presentation: 'modal' }}>
             <Stack.Screen name="SignIn" component={SignIn} />
