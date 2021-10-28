@@ -1,6 +1,6 @@
 import {releaseChannel} from "expo-updates"
 
-let baseURL = "http://10.0.2.2:3000"
+let baseURL = "http://mycampsite-team12.herokuapp.com/"
 if (releaseChannel.startsWith("prod"))
     baseURL = ""
 export const env = {

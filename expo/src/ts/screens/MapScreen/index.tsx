@@ -8,16 +8,17 @@ import MapCampsiteMarker from '../../components/MapCampsiteMarker';
 import mapStyle from '../../lib/map_style';
 import {ExpoWebGLRenderingContext, GLView} from 'expo-gl';
 import ExpoTHREE, {THREE} from 'expo-three';
+import {fetch} from '../../lib/api';
 // import {Magnetometer} from 'expo-sensors';
 
-const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
+const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
+  const { ignoreDeviceLocation } = route.params;
   const [location, setLocation] = useState<number[]>([45.39174144302487, -79.21459743503355]);
-  const [userLocation, setUserLocation] = useState<number[]>([]);
   const [errorMsg, setErrorMsg] = useState('');
   const map = useRef<MapView>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [buttonMsg, setButtonMsg] = useState("hello");
-  const [campsiteMarkers, setCampsiteMarkers] = useState<any[]>([]);
+  const [park, setPark] = useState<any>({});
   const camera: any = {
     center: {
       latitude: location[0],
@@ -32,6 +33,43 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
   useEffect(() => {
     global.THREE = global.THREE || THREE;
     return () => clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let latitude = 45.39174144302487;
+      let longitude = -79.21459743503355;
+      if (ignoreDeviceLocation) {
+        // TODO: set to predefined location
+      } else {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
+        let location = await Location.getCurrentPositionAsync({});
+        latitude = location.coords.latitude;
+        longitude = location.coords.longitude;
+      }
+      setLocation([latitude, longitude]);
+      
+      fetch('location')
+        .then(res => res.json())
+        .then(data => { 
+          const currentPark = data.filter((currentPark: any) => {
+            const { latitudeStart, latitudeEnd, longitudeStart, longitudeEnd } = currentPark.boundary;
+            let minLatitude = Math.min(latitudeStart, latitudeEnd);
+            let maxLatitude = Math.max(latitudeStart, latitudeEnd);
+            let minLongitude = Math.min(longitudeStart, longitudeEnd);
+            let maxLongitude = Math.max(longitudeStart, longitudeEnd);
+            return latitude >= minLatitude 
+              && latitude <= maxLatitude 
+              && longitude >= minLongitude 
+              && longitude <= maxLongitude;
+          });
+          setPark(currentPark[0]);
+        });
+    })();
   }, []);
 
   // magnometer
@@ -67,13 +105,6 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
   //   _subscribe();
   //   return () => _unsubscribe();
   // }, []);
-  
-  // load random campsites near arrowhead
-  useEffect(() => {
-    setCampsiteMarkers(Array.from({length: 30}, (_, i) => { 
-        return { num: i, latitude: location[0] + Math.random()/500, longitude: location[1] + Math.random()/500 }
-    }));
-  }, [])
 
   const moveUp = () => {
     setLocation([location[0], location[1] + 0.00001]);
@@ -120,23 +151,11 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
       appState.current.camera = camera;
     }
   }
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-      let location = await Location.getCurrentPositionAsync({});
-      setUserLocation([location.coords.latitude, location.coords.longitude]);
-    })();
-  }, []);
-  
+  if (park)
   return (
     <View style={styles.container}>
       { errorMsg ? <Text>{errorMsg}</Text> : null }
-      {/* <Button title={"LIVE MODE:" + buttonMsg} onPress={moveUp}></Button> */}
+      <Button title={"DEBUG:" + buttonMsg} onPress={moveUp}></Button>
       <View style={styles.overlay} pointerEvents={'none'}>
         <GLView
           style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height }}
@@ -166,7 +185,7 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
             light.position.z = 5;
             _scene.add(light);
 
-            const yaxis = new THREE.Vector3(0, 1, 0);
+            // const yaxis = new THREE.Vector3(0, 1, 0);
 
             const render = () => {
               timeout = requestAnimationFrame(render);
@@ -213,7 +232,7 @@ const MapScreen = ({ navigation }: Types.MapScreenNavigationProp) => {
         minZoomLevel={15}
         maxZoomLevel={19}
       >
-        {campsiteMarkers.map(obj => <MapCampsiteMarker key={obj.num} num={obj.num} latitude={obj.latitude} longitude={obj.longitude} />)}
+        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} />)}
       </MapView>
     </View>
   )

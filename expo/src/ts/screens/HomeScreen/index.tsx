@@ -102,9 +102,12 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       <Text style={styles.text}>Guestbooks near you:</Text>
       <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
       <View style={styles.btnWrapper}>
-        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Map')}>
-          <Text style={styles.btnText}>Go to Map</Text>
+        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: true})}>
+          <Text style={styles.btnText}>Go to Arrowhead Park Map</Text>
         </TouchableOpacity>
+        {/* <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: false})}>
+          <Text style={styles.btnText}>Go to Live Map (WIP)</Text>
+        </TouchableOpacity> */}
       </View>
       <Button title="Me" onPress={() => navigation.navigate('Me')} />
     </View>
