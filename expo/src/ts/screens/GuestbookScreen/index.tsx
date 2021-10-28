@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import * as Types from '../../types';
 
 const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationProp) => {
@@ -7,23 +7,26 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{locationName} Guestbook</Text>
+      <Image source={require('../../../../assets/images/lake.png')} style={{ width: '100%', height: 200 }} />
+      <View style={styles.mainCard}>
+        <Text style={styles.text}>{locationName} Guestbook</Text>
 
-      {posts &&
-        posts.map((post: any) => {
-          return (
-            <View key={post.postId} style={styles.btnWrapper}>
-              <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Post', { post: post })}>
-                <Text style={styles.text}>{post.date}</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
+        {posts &&
+          posts.map((post: any) => {
+            return (
+              <View key={post.postId} style={styles.btnWrapper}>
+                <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Post', { post: post })}>
+                  <Text style={styles.text}>{post.date}</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
 
-      <View style={styles.btnWrapper}>
-        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Home')}>
-          <Text style={styles.btnText}>Go To Home</Text>
-        </TouchableOpacity>
+        {/* <View style={styles.btnWrapper}>
+          <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Home')}>
+            <Text style={styles.btnText}>Go To Home</Text>
+          </TouchableOpacity>
+        </View> */}
       </View>
     </View>
   );
@@ -31,11 +34,11 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#334257',
+    backgroundColor: '#005131',
     color: 'white',
     height: '100%',
     flexDirection: 'column',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-start',
   },
   text: {
     fontSize: 20,
@@ -58,6 +61,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 7,
     width: '50%',
+  },
+  mainCard: {
+    backgroundColor: '#005131',
+    color: 'white',
+    flexDirection: 'column',
+    height: 600,
+    position: 'relative',
+    top: -20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 10,
   },
 });
 
