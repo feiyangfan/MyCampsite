@@ -11,8 +11,6 @@ import {
   deleteSiteById,
 } from "../controllers/location.js";
 
-import {authenticate} from "../controllers/googlecloud.js";
-
 const router = express.Router();
 
 // Park information
@@ -21,7 +19,7 @@ const router = express.Router();
 router.get("/", getAllParks);
 
 // Get location of park by ID
-router.get("/:parkId/", authenticate, getParkById);
+router.get("/:parkId/", getParkById);
 
 // Add a new park location
 router.post("/", addPark);
