@@ -15,6 +15,7 @@ export const authenticate = async (req, res, next) => {
             uid: token.uid,
             emailVerified: token.email_verified
         };
+        console.log("ye boi: " + req.auth.toString());
     }
     else
         req.auth = null;
