@@ -1,6 +1,6 @@
 import {User, getAuth, onAuthStateChanged, signOut as firebaseSignOut, signInWithCredential, AuthCredential,
         GoogleAuthProvider, fetchSignInMethodsForEmail, createUserWithEmailAndPassword, sendPasswordResetEmail,
-        signInWithEmailAndPassword, sendEmailVerification} from "firebase/auth"
+        sendEmailVerification, EmailAuthProvider} from "firebase/auth"
 import {useEffect, useState} from "react"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
 import * as Google from "expo-auth-session/providers/google"
@@ -8,6 +8,7 @@ import {expoAuthConfig} from "../config"
 import {RootStackParamList} from "../../types"
 import {useAppDispatch, useAppSelector} from "../store"
 import authSlice from "./slice"
+import {fetch} from "../api"
 
 /**
  * Current firebase user, user value is only valid when ready is true
@@ -19,8 +20,6 @@ export const useUser = (): [User | null, boolean] => {
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, newUser => {
-            console.log(`onAuthStateChanged uid: ${newUser?.uid}, anonymous: ${newUser?.isAnonymous}, ` +
-                        `provider: ${newUser?.providerId}, verified: ${newUser?.emailVerified}`)
             setUser(newUser)
             if (!ready)
                 setReady(true)
@@ -83,9 +82,22 @@ export const useAuthWall = (presentImmediately = false) => {
     return {user, authWallAction: action, signIn, signOut}
 }
 
-const signInFromProvider = (cred: AuthCredential) => {
-    signInWithCredential(getAuth(), cred)
-        .then(cred => console.log(`Firebase sign in response: ${cred.operationType}`))
+// TODO reconsider
+const signInFromProvider = async (cred: AuthCredential) => {
+    const res = await signInWithCredential(getAuth(), cred)
+    console.log(`Firebase sign in: ${res.operationType}, using: ${res.providerId}, uid: ${res.user.uid}`)
+
+    // TODO temp solution
+    await fetch("/profile/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            create: true,
+            displayName: res.user.displayName
+        })
+    })
 }
 
 export const useGoogleSignInPrompt = () => {
@@ -107,11 +119,10 @@ export const usePasswordSignIn = () => {
         const methods = await fetchSignInMethodsForEmail(auth, email)
         if (methods.length == 0) {
             const {user} = await createUserWithEmailAndPassword(auth, email, password)
-            return await sendEmailVerification(user)
+            await sendEmailVerification(user)
         }
-        else {
-            return await signInWithEmailAndPassword(auth, email, password)
-        }
+        else
+            signInFromProvider(EmailAuthProvider.credential(email, password))
     }
 
     const resetPassword = (email: string) => {
