@@ -1,4 +1,4 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -14,29 +14,17 @@ export type RootStackParamList = {
   Post: {
     post: any;
   };
+  AddSite: {
+    location: any;
+    parkId: any;
+  };
   Me: undefined;
 };
 
-type HomeScreenNavigationProp = NativeStackScreenProps<
-  RootStackParamList,
-  "Home"
->;
-type MapScreenNavigationProp = NativeStackScreenProps<
-  RootStackParamList,
-  "Map"
->;
-type GuestbookScreenNavigationProp = NativeStackScreenProps<
-  RootStackParamList,
-  "Guestbook"
->;
-type PostScreenNavigationProp = NativeStackScreenProps<
-  RootStackParamList,
-  "Post"
->;
+type HomeScreenNavigationProp = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type MapScreenNavigationProp = NativeStackScreenProps<RootStackParamList, 'Map'>;
+type GuestbookScreenNavigationProp = NativeStackScreenProps<RootStackParamList, 'Guestbook'>;
+type PostScreenNavigationProp = NativeStackScreenProps<RootStackParamList, 'Post'>;
+type AddSiteScreenNavigationProp = NativeStackScreenProps<RootStackParamList, 'AddSite'>;
 
-export {
-  HomeScreenNavigationProp,
-  MapScreenNavigationProp,
-  GuestbookScreenNavigationProp,
-  PostScreenNavigationProp,
-};
+export { HomeScreenNavigationProp, MapScreenNavigationProp, GuestbookScreenNavigationProp, PostScreenNavigationProp, AddSiteScreenNavigationProp };

@@ -9,15 +9,14 @@ import mapStyle from '../../lib/map_style';
 import {ExpoWebGLRenderingContext, GLView} from 'expo-gl';
 import ExpoTHREE, {THREE} from 'expo-three';
 import {fetch} from '../../lib/api';
+import * as geolib from 'geolib';
 // import {Magnetometer} from 'expo-sensors';
 
 const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   const { ignoreDeviceLocation } = route.params;
   const [location, setLocation] = useState<number[]>([45.39174144302487, -79.21459743503355]);
-  const [errorMsg, setErrorMsg] = useState('');
   const map = useRef<MapView>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [buttonMsg, setButtonMsg] = useState("hello");
   const [park, setPark] = useState<any>({});
   const camera: any = {
     center: {
@@ -44,7 +43,6 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
       } else {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
           return;
         }
         let location = await Location.getCurrentPositionAsync({});
@@ -52,8 +50,8 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
         longitude = location.coords.longitude;
       }
       setLocation([latitude, longitude]);
-      
-      fetch('location')
+
+      fetch('/location')
         .then(res => res.json())
         .then(data => { 
           const currentPark = data.filter((currentPark: any) => {
@@ -71,6 +69,17 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
         });
     })();
   }, []);
+
+  // Return true if the user is in range of a given site (or site is on spotlight), false otherwise.
+  const siteInRange = (site: any) => {
+    if (site.location.radius < 0) return true;
+    const distance = geolib.getPreciseDistance(
+      { latitude: site.location.latitude, longitude: site.location.longitude },
+      { latitude: location[0], longitude: location[1] }
+    );
+    const inRange = site.location.radius >= distance;
+    return inRange;
+  };
 
   // magnometer
   // const [subscription, setSubscription] = useState<any>(null);
@@ -162,8 +171,6 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   if (park)
   return (
     <View style={styles.container}>
-      { errorMsg ? <Text>{errorMsg}</Text> : null }
-      <Button title={"DEBUG:" + buttonMsg} onPress={moveUp}></Button>
       <View style={styles.overlay} pointerEvents={'none'}>
         <GLView
           style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height }}
@@ -240,7 +247,7 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
         minZoomLevel={15}
         maxZoomLevel={19}
       >
-        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} moveToGuestbook={moveToGuestbook} />)}
+        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} moveToGuestbook={moveToGuestbook} siteInRange={() => siteInRange(site)} />)}
       </MapView>
     </View>
   )

@@ -1,29 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import * as Types from '../../types';
-import GuestbookList from '../../components/GuestbookList';
+import { Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Button } from 'react-native-elements';
 import * as Location from 'expo-location';
 import * as geolib from 'geolib';
-import { current } from '@reduxjs/toolkit';
+
+import * as Types from '../../types';
+import GuestbookList from '../../components/GuestbookList';
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   const locationURL = 'http://mycampsite-team12.herokuapp.com/location';
   const [nearbySites, setNearbySites] = useState<any[]>([]);
   const [allSites, setAllSites] = useState<any[]>([]);
   const [userLocation, setUserLocation] = useState<number[]>([]);
-  const [userParks, setUserParks] = useState<any[]>([]);
+  const [nearestParkId, setNearestParkId] = useState();
   const [subscription, setSubscription] = useState<any>();
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Get location permissions, watch user's location, and set current park
+  const backgroundImg = '../../../../assets/images/lake.png';
+
+  // Get location permissions, watch user's location, and initialize list of sites
   useEffect(() => {
     (async () => {
+      // Get location permissions
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
         return;
       }
+
+      // Get initial location and determine current park
+      const location = await Location.getCurrentPositionAsync();
+      setUserLocation([location.coords.latitude, location.coords.longitude]);
+      initializeSiteList(location);
+
+      // Subscribe to location updates
       watchPosition();
     })();
   }, []);
@@ -34,14 +44,13 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 0 },
       (location) => {
         setUserLocation([location.coords.latitude, location.coords.longitude]);
-        storeParksList(location);
       }
     );
     setSubscription(newSubscription);
   };
 
-  // Set parks list once location subscription changes
-  const storeParksList = (location: { coords: { latitude: number; longitude: number } }) => {
+  // Initialize list of all sites within any park the user is near
+  const initializeSiteList = (location: { coords: { latitude: number; longitude: number } }) => {
     // Fetch parks list
     let parks: any[] = [];
 
@@ -63,7 +72,11 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
       return inLatitude && inLongitude;
     });
-    setUserParks(parkArray);
+
+    // Store nearest park
+    try {
+      setNearestParkId(parkArray[0]._id);
+    } catch (err) {}
 
     // Store sites from current list of parks (in case there is more than one):
     const sites: any[] = [];
@@ -99,50 +112,71 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Guestbooks near you:</Text>
-      <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
-      <View style={styles.btnWrapper}>
-        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: true})}>
-          <Text style={styles.btnText}>Go to Arrowhead Park Map</Text>
-        </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: false})}>
-          <Text style={styles.btnText}>Go to Live Map (WIP)</Text>
-        </TouchableOpacity> */}
+      <Image source={require('../../../../assets/images/lake.png')} style={{ width: '100%', height: 200 }} />
+      <View style={styles.mainCard}>
+        <Text style={styles.text}>Guestbooks near you:</Text>
+        <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
+        <View style={styles.loginWrapper}>
+          <Button
+            style={styles.loginBtn}
+            title="View Map"
+            onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: true})}
+          />
+        </View>
+        <View style={styles.loginWrapper}>
+          <Button
+            style={styles.loginBtn}
+            title="Add New Site"
+            onPress={() =>
+              navigation.navigate('AddSite', {
+                location: userLocation,
+                parkId: nearestParkId,
+              })
+            }
+          />
+        </View>
+        <View style={styles.loginWrapper}>
+          <Button style={styles.loginBtn} title="My Account" onPress={() => navigation.navigate('Me')} />
+        </View>
       </View>
-      <Button title="Me" onPress={() => navigation.navigate('Me')} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#334257',
+    backgroundColor: '#005131',
     color: 'white',
     height: '100%',
     flexDirection: 'column',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-start',
   },
   text: {
-    fontSize: 20,
-    textAlign: 'center',
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    marginTop: 40,
+    textAlign: 'left',
     color: 'white',
   },
-  btnWrapper: {
-    width: '100%',
-    justifyContent: 'center',
+  mainCard: {
+    backgroundColor: '#005131',
+    color: 'white',
+    flexDirection: 'column',
+    height: 600,
+    position: 'relative',
+    top: -20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 10,
+  },
+
+  loginWrapper: {
     alignItems: 'center',
   },
-  btnText: {
-    textAlign: 'center',
-    color: 'white',
-    fontSize: 20,
-  },
-  btn: {
-    backgroundColor: 'grey',
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 7,
-    width: '50%',
+  loginBtn: {
+    marginTop: 100,
+    width: 200,
   },
 });
 
