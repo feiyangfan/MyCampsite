@@ -11,7 +11,7 @@ import {
   deleteSiteById,
 } from "../controllers/location.js";
 
-import {authenticate} from "../lib/auth.js";
+import {authenticate} from "../controllers/googlecloud.js";
 
 const router = express.Router();
 
