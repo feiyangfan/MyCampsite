@@ -11,6 +11,8 @@ import {
   deleteSiteById,
 } from "../controllers/location.js";
 
+import {authenticate} from "../lib/auth.js";
+
 const router = express.Router();
 
 // Park information
@@ -19,7 +21,7 @@ const router = express.Router();
 router.get("/", getAllParks);
 
 // Get location of park by ID
-router.get("/:parkId/", getParkById);
+router.get("/:parkId/", authenticate, getParkById);
 
 // Add a new park location
 router.post("/", addPark);
