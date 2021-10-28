@@ -17,5 +17,24 @@ export const getProfile = (req, res, next) => {
     }
 };
 
-export const setProfile = async (req, res) => {
+export const setProfile = async (req, res, next) => {
+    const {
+        params: {id},
+        body
+    } = req;
+    const uid = req.auth?.uid;
+
+    try {
+        let profile = await (id ? Profile.findById(id) : Profile.findOne({uid}));
+
+        if (!(body.create && profile)) {
+            if (!profile)
+                profile = new Profile({uid});
+            profile.displayName = body.displayName;
+            await profile.save();
+        }
+        res.json(profile);
+    } catch (error) {
+        next(error);
+    }
 };
