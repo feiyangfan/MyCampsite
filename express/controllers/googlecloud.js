@@ -1,7 +1,9 @@
 import {initializeApp} from "firebase-admin/app";
 import {getAuth} from "firebase-admin/auth";
+import {firebaseConfig} from "../lib/config.js";
 
-initializeApp();
+const app = initializeApp(firebaseConfig);
+console.log(`Firebase initialized: ${app.name}`);
 
 export const authenticate = async (req, res, next) => {
     const idToken = req.get("X-Firebase-IDToken");
