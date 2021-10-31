@@ -16,25 +16,28 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   const { ignoreDeviceLocation } = route.params;
   // map state
   const [location, setLocation] = useState<number[]>([45.39174144302487, -79.21459743503355]);
+  const [locationSubscription, setLocationSubscription] = useState<any>(null);
   const map = useRef<MapView>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [park, setPark] = useState<any>({});
   const camera: any = {
+    pitch: 89.999,
+    zoom: 19,
+    heading: 0,
+    altitude: 0.001,
     center: {
       latitude: location[0],
       longitude: location[1]
-    },
-    altitude: 10, 
-    pitch: 90, 
-    heading: 0,
-    zoom: 100
+    }
   };
 
   // map modes for demoing purposes
   const [mode, setMode] = useState<string>('demo');
   const changeMode = () => {
-    // unload map
+    // clean and unload map/location subscription
+    trackLocationOff();
     setMapLoaded(false);
+    // switch mode
     setMode(prev => {
       if (prev === 'demo') {
         return 'live';
@@ -53,17 +56,44 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   //debug
   const [debug, setDebug] = useState('');
 
-  // set location based on mode
-  const setLocationByMode = async () => {
-    let latitude = 45.39174144302487;
-      let longitude = -79.21459743503355;
+  const trackLocationOn = async () => {
+    let latitude = 0;
+    let longitude = 0;
+    const newSubscription = await Location.watchPositionAsync(
+      { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 0 },
+      (location) => {
+        latitude = location.coords.latitude;
+        longitude = location.coords.longitude;
+        setLocation([location.coords.latitude, location.coords.longitude]);
+      }
+    );
+    setLocationSubscription(newSubscription);
+    return [latitude, longitude];
+  }
+
+  const trackLocationOff = () => {
+    if (locationSubscription != null) {
+      locationSubscription.remove() 
+    }
+    setLocationSubscription(null);
+  }
+
+  // set location on start
+  useEffect(() => {
+    (async () => {
+      let latitude = 0;
+      let longitude = 0;
       if (mode === 'demo') {
-        // TODO: set to predefined location
+        // Pre-defined location: Arrowhead Provincial Park
+        latitude = 45.39174144302487;
+        longitude = -79.21459743503355;
       } else {
+        // Tracking device location
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           return;
         }
+        // on first load - call for user location once 
         let location = await Location.getCurrentPositionAsync({});
         latitude = location.coords.latitude;
         longitude = location.coords.longitude;
@@ -91,12 +121,6 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
             setPark({});
           }
         })
-  }
-
-  // set location on start
-  useEffect(() => {
-    (async () => {
-      setLocationByMode();
     })();
   }, [mode]);
 
@@ -157,37 +181,39 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   useEffect(() => {
     if (mapLoaded) {
       if (map.current && location) {
-        map.current.animateCamera({
-          center: {
-            latitude: location[0],
-            longitude: location[1],
-          },
-          altitude: 0.001, 
-          pitch: 89.999, 
-          heading: 0,
-          zoom: 20
-        }, { duration: 700 });
+        map.current.animateCamera( 
+          {
+            center: {
+              latitude: location[0],
+              longitude: location[1],
+            },
+            altitude: appState.current.camera.altitude, 
+            pitch: appState.current.camera.pitch, 
+            heading: appState.current.camera.heading,
+            zoom: appState.current.camera.zoom
+          }
+        , { duration: mode === 'demo' ? 700 : 0 }); // no animation in live mode, otherwise map will animate every 5 seconds
+        // recalibrate camera after moving
+        onMapPress();
       }
-      onMapPress();
     }
   }, [mapLoaded, location])
 
-  const storage: any = {
+  const appState = useRef({
     camera: {
-      pitch: 0,
-      zoom: 0,
+      pitch: 89.999,
+      zoom: 19,
       heading: 0,
-      altitude: 0,
+      altitude: 0.001,
       center: {
-        latitude: 0,
-        longitude: 0
+        latitude: location[0],
+        longitude: location[1]
       }
     },
     user: {
       heading: 0
     }
-  }
-  const appState = useRef(storage);
+  });
 
   // store camera state on map press
   const onMapPress = async () => {
@@ -198,17 +224,26 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   }
 
   // alert overlays
+  const [alertVisible, setAlertVisible] = useState(true);
+  // pause location tracking when alert is being viewed
+  useEffect(() => {
+    if (mode !== 'demo') {
+      if (alertVisible) {
+        trackLocationOff();
+      } else {
+        trackLocationOn();
+      }
+    }
+  }, [alertVisible]);
+
   const AlertOverlay = (props: any) => {
-    const [visible, setVisible] = useState(true);
-  
     const toggleOverlay = () => {
-      setVisible(!visible);
+      props.toggleVisible();
     };
-    
     return (
       <View style={{position: 'absolute', top: 100, left: 0, zIndex: 2}}>
-        <Button buttonStyle={{backgroundColor: '#00AB67'}} title={`Map Mode: ${props.mode === 'demo' ? 'DEMO' : 'LIVE'} MODE`} onPress={toggleOverlay} />
-        <Overlay overlayStyle={{borderRadius: 10, borderWidth: 2, borderColor: 'green', padding: 20, backgroundColor: '#00AB67'}} isVisible={visible} onBackdropPress={toggleOverlay}>
+        <Button buttonStyle={{backgroundColor: '#00AB67'}} title={`Map Mode: ${props.mode === 'demo' ? 'Demo' : 'Live'} Mode`} onPress={toggleOverlay} />
+        <Overlay overlayStyle={{borderRadius: 10, borderWidth: 2, borderColor: 'green', padding: 20, backgroundColor: '#00AB67'}} isVisible={props.visible} onBackdropPress={toggleOverlay}>
           <Text h3 h3Style={{color: 'white', textAlign: 'center'}}>You are in Deliverable 2</Text>
           <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 30 }}>{props.mode === 'demo' ? 'Demo' : 'Live'} Mode</Text>
           { props.mode === 'demo' ? 
@@ -225,7 +260,7 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
               <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 20, fontSize: 14, fontWeight: 'bold'  }}>• You may walk around to move your robot character.</Text>
             </View>
           }
-          <Button titleStyle={{color: "green"}} buttonStyle={{backgroundColor: 'white', marginBottom: 20}} title={`Click here to go to ${props.mode !== 'demo' ? 'DEMO' : 'LIVE'} MODE (this may take a moment...)`} onPress={props.changeMode} />
+          <Button titleStyle={{color: "green"}} buttonStyle={{backgroundColor: 'white', marginBottom: 20}} title={`Click here to go to ${props.mode !== 'demo' ? 'Demo' : 'Live'} Mode`} onPress={props.changeMode} />
           <Button titleStyle={{color: "green"}} buttonStyle={{backgroundColor: 'white'}} title="Return to Map" onPress={toggleOverlay}></Button>
         </Overlay>
       </View>
@@ -234,9 +269,9 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   if (park) {
     return (
       <View style={styles.container}>
-        { mapLoaded ? <AlertOverlay mode={mode} changeMode={changeMode} /> : null }
-        { mapLoaded && Object.keys(park).length === 0 ?  <View style={{position: 'absolute', top: 150, right: 0, zIndex: 2}}>
-          <Button buttonStyle={{backgroundColor: '#00AB67'}} title={`You are not in a park!`} />
+        { mapLoaded ? <AlertOverlay mode={mode} changeMode={changeMode} visible={alertVisible} toggleVisible={() => setAlertVisible(prev => !prev)} /> : null }
+        { mapLoaded ?  <View style={{position: 'absolute', top: 100, right: 0, zIndex: 2}}>
+          <Button buttonStyle={{backgroundColor: '#00AB67'}} title={`Location: ${Object.keys(park).length === 0  ? 'Unknown' : park.name}`} />
           </View> : null }
         <View style={styles.overlay} pointerEvents={'none'}>
           <GLView
@@ -280,10 +315,9 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
                   _camera.position.set(r * Math.sin(theta) * Math.cos(phi), r * Math.cos(theta), r * Math.sin(theta) * Math.sin(phi));
                   // set object to match DeviceMotion heading
                   // object.setRotationFromAxisAngle(yaxis, appState.current.user.heading);
-                } else {
-                  _camera.position.set(0, 10, 0);
+                  _camera.lookAt(object.position); 
                 }
-                _camera.lookAt(object.position);  
+                 
                 renderer.render(_scene, _camera);
                 gl.endFrameEXP();
               };
@@ -297,7 +331,7 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
           style={styles.map} 
           provider={PROVIDER_GOOGLE}
           mapType={"standard"}
-          camera={camera}
+          camera={appState.current ? appState.current.camera : camera}
           showsUserLocation={false} // no need for blue location dot - we have mister robot :D
           followsUserLocation={true}
           showsCompass={false}
