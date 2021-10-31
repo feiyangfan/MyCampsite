@@ -119,13 +119,19 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
         <View style={styles.loginWrapper}>
           <Button
             style={styles.loginBtn}
-            title="View Map"
+            buttonStyle={{backgroundColor: '#00AB67'}}
+            title="View Map (Demo)"
             onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: true})}
           />
-        </View>
-        <View style={styles.loginWrapper}>
           <Button
             style={styles.loginBtn}
+            buttonStyle={{backgroundColor: '#00AB67'}}
+            title="View Map (Live)"
+            onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: false})}
+          />
+          <Button
+            style={styles.loginBtn}
+            buttonStyle={{backgroundColor: '#00AB67'}}
             title="Add New Site"
             onPress={() =>
               navigation.navigate('AddSite', {
@@ -134,9 +140,7 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
               })
             }
           />
-        </View>
-        <View style={styles.loginWrapper}>
-          <Button style={styles.loginBtn} title="My Account" onPress={() => navigation.navigate('Me')} />
+          <Button style={styles.loginBtn} buttonStyle={{backgroundColor: '#00AB67'}} title="My Account" onPress={() => navigation.navigate('Me')} />
         </View>
       </View>
     </View>
@@ -170,14 +174,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     padding: 10,
   },
-
   loginWrapper: {
     alignItems: 'center',
   },
   loginBtn: {
-    marginTop: 100,
-    width: 200,
-  },
+    marginTop: 25,
+    width: 200
+  }
 });
 
 export default HomeScreen;

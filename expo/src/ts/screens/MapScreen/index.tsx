@@ -16,7 +16,6 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   const { ignoreDeviceLocation } = route.params;
   // map state
   const [location, setLocation] = useState<number[]>([45.39174144302487, -79.21459743503355]);
-  const [locationSubscription, setLocationSubscription] = useState<any>(null);
   const map = useRef<MapView>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [park, setPark] = useState<any>({});
@@ -31,21 +30,6 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
     }
   };
 
-  // map modes for demoing purposes
-  const [mode, setMode] = useState<string>('demo');
-  const changeMode = () => {
-    // clean and unload map/location subscription
-    trackLocationOff();
-    setMapLoaded(false);
-    // switch mode
-    setMode(prev => {
-      if (prev === 'demo') {
-        return 'live';
-      }
-      return 'demo';
-    })
-  }
-   
   // initialize three
   let timeout!: number;
   useEffect(() => {
@@ -53,29 +37,30 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
     return () => clearTimeout(timeout);
   }, []);
 
-  //debug
-  const [debug, setDebug] = useState('');
-
-  const trackLocationOn = async () => {
-    let latitude = 0;
-    let longitude = 0;
-    const newSubscription = await Location.watchPositionAsync(
-      { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 0 },
-      (location) => {
-        latitude = location.coords.latitude;
-        longitude = location.coords.longitude;
-        setLocation([location.coords.latitude, location.coords.longitude]);
-      }
-    );
-    setLocationSubscription(newSubscription);
-    return [latitude, longitude];
+  const trackingDefault = {tracking: false, id: null};
+  const trackingLocation = useRef<any>(trackingDefault);
+  const [loading, setLoading] = useState(!ignoreDeviceLocation);
+  const track = async () => {
+    if (trackingLocation.current.tracking) {
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation([location.coords.latitude, location.coords.longitude])
+      setLoading(false);
+    }
+  }
+  const trackLocationOn = async () => {  
+    trackingLocation.current.tracking = true;
+    await track();
+    let id = setInterval(async () => {
+      await track();
+    }, 5000); 
+    trackingLocation.current.id = id;
   }
 
   const trackLocationOff = () => {
-    if (locationSubscription != null) {
-      locationSubscription.remove() 
+    if (trackingLocation.current.id != null) {
+      clearInterval(trackingLocation.current.id);
     }
-    setLocationSubscription(null);
+    trackingLocation.current = trackingDefault;
   }
 
   // set location on start
@@ -83,22 +68,19 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
     (async () => {
       let latitude = 0;
       let longitude = 0;
-      if (mode === 'demo') {
+      if (ignoreDeviceLocation) {
         // Pre-defined location: Arrowhead Provincial Park
         latitude = 45.39174144302487;
         longitude = -79.21459743503355;
+        setLocation([latitude, longitude]);
       } else {
         // Tracking device location
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           return;
         }
-        // on first load - call for user location once 
-        let location = await Location.getCurrentPositionAsync({});
-        latitude = location.coords.latitude;
-        longitude = location.coords.longitude;
+        trackLocationOn();
       }
-      setLocation([latitude, longitude]);
 
       fetch('/location')
         .then(res => res.json())
@@ -122,7 +104,12 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
           }
         })
     })();
-  }, [mode]);
+    return () => {
+      if (!ignoreDeviceLocation) {
+        trackLocationOff();
+      }
+    };
+  }, []);
 
   // Return true if the user is in range of a given site (or site is on spotlight), false otherwise.
   const siteInRange = (site: any) => {
@@ -181,8 +168,23 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   useEffect(() => {
     if (mapLoaded) {
       if (map.current && location) {
-        map.current.animateCamera( 
-          {
+        if (ignoreDeviceLocation) {
+          map.current.animateCamera( 
+            {
+              center: {
+                latitude: location[0],
+                longitude: location[1],
+              },
+              altitude: appState.current.camera.altitude, 
+              pitch: appState.current.camera.pitch, 
+              heading: appState.current.camera.heading,
+              zoom: appState.current.camera.zoom
+            }
+          , { duration: 700 }); 
+        } 
+        // no animation in live mode, otherwise map will animate every 5 seconds
+        else {
+          map.current.setCamera({
             center: {
               latitude: location[0],
               longitude: location[1],
@@ -191,12 +193,11 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
             pitch: appState.current.camera.pitch, 
             heading: appState.current.camera.heading,
             zoom: appState.current.camera.zoom
-          }
-        , { duration: mode === 'demo' ? 700 : 0 }); // no animation in live mode, otherwise map will animate every 5 seconds
-        // recalibrate camera after moving
+          });
+        }
         onMapPress();
       }
-    }
+    } 
   }, [mapLoaded, location])
 
   const appState = useRef({
@@ -223,142 +224,166 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
     }
   }
 
-  // alert overlays
-  const [alertVisible, setAlertVisible] = useState(true);
-  // pause location tracking when alert is being viewed
-  useEffect(() => {
-    if (mode !== 'demo') {
-      if (alertVisible) {
-        trackLocationOff();
-      } else {
-        trackLocationOn();
-      }
-    }
-  }, [alertVisible]);
-
-  const AlertOverlay = (props: any) => {
-    const toggleOverlay = () => {
-      props.toggleVisible();
-    };
-    return (
-      <View style={{position: 'absolute', top: 100, left: 0, zIndex: 2}}>
-        <Button buttonStyle={{backgroundColor: '#00AB67'}} title={`Map Mode: ${props.mode === 'demo' ? 'Demo' : 'Live'} Mode`} onPress={toggleOverlay} />
-        <Overlay overlayStyle={{borderRadius: 10, borderWidth: 2, borderColor: 'green', padding: 20, backgroundColor: '#00AB67'}} isVisible={props.visible} onBackdropPress={toggleOverlay}>
-          <Text h3 h3Style={{color: 'white', textAlign: 'center'}}>You are in Deliverable 2</Text>
-          <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 30 }}>{props.mode === 'demo' ? 'Demo' : 'Live'} Mode</Text>
-          { props.mode === 'demo' ? 
-            <View>
-              <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 16, fontWeight: 'bold'  }}>In demo mode, your location is fixed at Arrowhead Provincial Park.</Text>
-              <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may click on the Entrance Site to view its Guestbook.</Text>
-              <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 20, fontSize: 14, fontWeight: 'bold'  }}>• You may rotate or tilt the map to view your surroundings.</Text>
-            </View>
-          : 
-            <View>
-              <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 16, fontWeight: 'bold' }}>In live mode, your location is tracked from your device.</Text>
-              <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may visit Arrowhead Provincinal Park to view the Guestbooks.</Text>
-              <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may rotate or tilt the map to view your surroundings.</Text>
-              <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 20, fontSize: 14, fontWeight: 'bold'  }}>• You may walk around to move your robot character.</Text>
-            </View>
+  // const AlertOverlay = (props: any) => {
+  //   const [visible, setVisible] = useState<boolean>(props.mode !== 'demo' ? props.liveFirstLoad : true);
+  //   const toggleOverlay = () => {
+  //     setVisible(prev => {
+  //       if (props.mode !== 'demo') {
+  //         if (liveFirstLoad) {
+  //           setLiveFirstLoad(false);
+  //         }
+  //         if (prev) {
+  //           trackLocationOn();
+  //         } else {
+  //           trackLocationOff();
+  //         }
+  //       }
+  //       return !prev;
+  //     });
+  //   };
+  //   return (
+  //     <View style={{position: 'absolute', top: 100, left: 0, zIndex: 2}}>
+  //       <Button buttonStyle={{backgroundColor: '#00AB67'}} title={`Map Mode: ${props.mode === 'demo' ? 'Demo' : 'Live'} Mode`} onPress={toggleOverlay} />
+  //       <Overlay overlayStyle={{borderRadius: 10, borderWidth: 2, borderColor: 'green', padding: 20, backgroundColor: '#00AB67'}} isVisible={visible} onBackdropPress={toggleOverlay}>
+  //         <Text h3 h3Style={{color: 'white', textAlign: 'center'}}>You are in Deliverable 2</Text>
+  //         <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 30 }}>{props.mode === 'demo' ? 'Demo' : 'Live'} Mode</Text>
+  //         { props.mode === 'demo' ? 
+  //           <View>
+  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 16, fontWeight: 'bold'  }}>In demo mode, your location is fixed at Arrowhead Provincial Park.</Text>
+  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may click on the Entrance Site to view its Guestbook.</Text>
+  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 20, fontSize: 14, fontWeight: 'bold'  }}>• You may rotate or tilt the map to view your surroundings.</Text>
+  //           </View>
+  //         : 
+  //           <View>
+  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 16, fontWeight: 'bold' }}>In live mode, your location is tracked from your device.</Text>
+  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may visit Arrowhead Provincinal Park to view the Guestbooks.</Text>
+  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may rotate or tilt the map to view your surroundings.</Text>
+  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 20, fontSize: 14, fontWeight: 'bold'  }}>• You may walk around to move your robot character.</Text>
+  //           </View>
+  //         }
+  //         <Button titleStyle={{color: "green"}} buttonStyle={{backgroundColor: 'white', marginBottom: 20}} title={`Click here to go to ${props.mode !== 'demo' ? 'Demo' : 'Live'} Mode`} onPress={props.changeMode} />
+  //         <Button titleStyle={{color: "green"}} buttonStyle={{backgroundColor: 'white'}} title="Return to Map" onPress={toggleOverlay}></Button>
+  //       </Overlay>
+  //     </View>
+  //   );
+  // };
+  return (
+    <View style={styles.container}>
+      {/* { mapLoaded ? <AlertOverlay mode={mode} changeMode={changeMode} liveFirstLoad={liveFirstLoad} /> : null } */}
+      { mapLoaded ?  <View style={{position: 'absolute', top: 100, left: 0, zIndex: 2, width: '100%', alignItems: 'center'}}>
+        <View>
+          <View style={{backgroundColor: '#00AB67', padding: 10}}>
+            <Text h3 h3Style={{color: 'white', textAlign: 'center', fontWeight: 'bold'  }}>{ignoreDeviceLocation ? 'Demo' : 'Live'} Mode</Text> 
+          </View>
+          { ignoreDeviceLocation ? 
+          <View style={{backgroundColor: '#86C496AC', padding: 10}}>
+          <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 16, fontWeight: 'bold'  }}>In demo mode, your location is fixed at Arrowhead Provincial Park.</Text>
+          <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may click on the Entrance Site to view its Guestbook.</Text>
+          <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 20, fontSize: 14, fontWeight: 'bold'  }}>• You may rotate or tilt the map to view your surroundings.</Text>
+          </View> :
+          <View style={{backgroundColor: '#86C496AC', padding: 10}}>
+            <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 16, fontWeight: 'bold' }}>In live mode, your location is tracked from your device.</Text>
+            <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may visit Arrowhead Provincinal Park to view the Guestbooks.</Text>
+            <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may rotate or tilt the map to view your surroundings.</Text>
+            <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 20, fontSize: 14, fontWeight: 'bold'  }}>• You may walk around to move your robot character.</Text>
+          </View>
           }
-          <Button titleStyle={{color: "green"}} buttonStyle={{backgroundColor: 'white', marginBottom: 20}} title={`Click here to go to ${props.mode !== 'demo' ? 'Demo' : 'Live'} Mode`} onPress={props.changeMode} />
-          <Button titleStyle={{color: "green"}} buttonStyle={{backgroundColor: 'white'}} title="Return to Map" onPress={toggleOverlay}></Button>
-        </Overlay>
-      </View>
-    );
-  };
-  if (park) {
-    return (
-      <View style={styles.container}>
-        { mapLoaded ? <AlertOverlay mode={mode} changeMode={changeMode} visible={alertVisible} toggleVisible={() => setAlertVisible(prev => !prev)} /> : null }
-        { mapLoaded ?  <View style={{position: 'absolute', top: 100, right: 0, zIndex: 2}}>
-          <Button buttonStyle={{backgroundColor: '#00AB67'}} title={`Location: ${Object.keys(park).length === 0  ? 'Unknown' : park.name}`} />
-          </View> : null }
-        <View style={styles.overlay} pointerEvents={'none'}>
-          <GLView
-            style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height }}
-            onContextCreate={async (gl: ExpoWebGLRenderingContext) => {
-              const renderer = new ExpoTHREE.Renderer({ gl });
-              renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
-              const _scene = new THREE.Scene(); 
-              
-              // load model
-              const model = {
-                'robot.glb': require('../../../../assets/models/robot.glb')
-              };
-
-              const gltf = await ExpoTHREE.loadAsync(model['robot.glb']);
-              const object = gltf.scene;
-              ExpoTHREE.utils.scaleLongestSideToSize(object, 4);
-              object.position.set(0, -10, 0);
-              _scene.add(object);
-
-              const _camera = new THREE.PerspectiveCamera(75, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.1, 1000);   
-              _camera.position.y = 10;
-              _camera.position.z = 0;
-              _camera.lookAt(object.position);
-    
-              const light = new THREE.DirectionalLight(0xFFFFFF, 1);
-              light.position.y = 3;
-              light.position.z = 5;
-              _scene.add(light);
-
-              // const yaxis = new THREE.Vector3(0, 1, 0);
-
-              const render = () => {
-                timeout = requestAnimationFrame(render);
-                if (appState.current) {
-                  let r = Math.max(20 - appState.current.camera.zoom, 0) * 15;
-                  // add fractional pitch when zero to prevent gimbal lock
-                  let theta = THREE.MathUtils.degToRad(appState.current.camera.pitch + (appState.current.camera.pitch === 0 ? .0001 : 0));
-                  let phi = THREE.MathUtils.degToRad(appState.current.camera.heading);
-                  // basic trig to get camera position
-                  _camera.position.set(r * Math.sin(theta) * Math.cos(phi), r * Math.cos(theta), r * Math.sin(theta) * Math.sin(phi));
-                  // set object to match DeviceMotion heading
-                  // object.setRotationFromAxisAngle(yaxis, appState.current.user.heading);
-                  _camera.lookAt(object.position); 
-                }
-                 
-                renderer.render(_scene, _camera);
-                gl.endFrameEXP();
-              };
-              render();
-            }}
-          />
         </View>
-        <MapView 
-          showsBuildings={true}
-          ref={map}
-          style={styles.map} 
-          provider={PROVIDER_GOOGLE}
-          mapType={"standard"}
-          camera={appState.current ? appState.current.camera : camera}
-          showsUserLocation={false} // no need for blue location dot - we have mister robot :D
-          followsUserLocation={true}
-          showsCompass={false}
-          scrollEnabled={false} // for ios
-          zoomTapEnabled={false}
-          toolbarEnabled={false} // for disabling on android
-          onPress={onMapPress}
-          onPanDrag={onMapPress}
-          onMapLoaded={() => setMapLoaded(true)}
-          customMapStyle={mapStyle}
-          scrollDuringRotateOrZoomEnabled={false}
-          loadingIndicatorColor={"#606060"}
-          loadingBackgroundColor={"#FFFFFF"}
-          minZoomLevel={15}
-          maxZoomLevel={19}
-        >
-          {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} moveToGuestbook={moveToGuestbook} siteInRange={() => siteInRange(site)} />)}
-        </MapView>
+      </View> : null }
+      { mapLoaded ?  
+        <View style={{position: 'absolute', top: 50, left: 0, width: '100%', alignItems: 'center', zIndex: 2}}>
+          <View style={{}}>
+            <View style={{backgroundColor: '#00AB67', padding: 10}}>
+              <Text h4 h4Style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 14}}>Location: {loading ? 'Loading...' : (Object.keys(park).length === 0  ? 'Unknown' : park.name)}</Text> 
+            </View>
+          </View>
+        </View> : null }
+      <View style={styles.overlay} pointerEvents={'none'}>
+        <GLView
+          style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height }}
+          onContextCreate={async (gl: ExpoWebGLRenderingContext) => {
+            const renderer = new ExpoTHREE.Renderer({ gl });
+            renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
+            const _scene = new THREE.Scene(); 
+            
+            // load model
+            const model = {
+              'robot.glb': require('../../../../assets/models/robot.glb')
+            };
+
+            const gltf = await ExpoTHREE.loadAsync(model['robot.glb']);
+            const object = gltf.scene;
+            ExpoTHREE.utils.scaleLongestSideToSize(object, 4);
+            object.position.set(0, -10, 0);
+            _scene.add(object);
+
+            const _camera = new THREE.PerspectiveCamera(75, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.1, 1000);   
+            _camera.position.y = 10;
+            _camera.position.z = 0;
+            _camera.lookAt(object.position);
+  
+            const light = new THREE.DirectionalLight(0xFFFFFF, 1);
+            light.position.y = 10;
+            light.position.z = 5;
+            _scene.add(light);
+
+            // const yaxis = new THREE.Vector3(0, 1, 0);
+
+            const render = () => {
+              timeout = requestAnimationFrame(render);
+              if (appState.current) {
+                let r = Math.max(20 - appState.current.camera.zoom, 0) * 15;
+                // add fractional pitch when zero to prevent gimbal lock
+                let theta = THREE.MathUtils.degToRad(appState.current.camera.pitch + (appState.current.camera.pitch === 0 ? .0001 : 0));
+                let phi = THREE.MathUtils.degToRad(appState.current.camera.heading);
+                // basic trig to get camera position
+                _camera.position.set(r * Math.sin(theta) * Math.cos(phi), r * Math.cos(theta), r * Math.sin(theta) * Math.sin(phi));
+                // set object to match DeviceMotion heading
+                // object.setRotationFromAxisAngle(yaxis, appState.current.user.heading);
+                _camera.lookAt(object.position); 
+              }
+              renderer.render(_scene, _camera);
+              gl.endFrameEXP();
+            };
+            render();
+          }}
+        />
       </View>
-    )
-  }
+      <MapView 
+        showsBuildings={true}
+        ref={map}
+        style={styles.map} 
+        provider={PROVIDER_GOOGLE}
+        mapType={"standard"}
+        camera={appState.current ? appState.current.camera : camera}
+        showsUserLocation={false} // no need for blue location dot - we have mister robot :D
+        followsUserLocation={true}
+        showsCompass={false}
+        scrollEnabled={false} // for ios
+        zoomTapEnabled={false}
+        toolbarEnabled={false} // for disabling on android
+        onPress={onMapPress}
+        onPanDrag={onMapPress}
+        onMapLoaded={() => setMapLoaded(true)}
+        customMapStyle={mapStyle}
+        scrollDuringRotateOrZoomEnabled={false}
+        loadingIndicatorColor={"#606060"}
+        loadingBackgroundColor={"#FFFFFF"}
+        minZoomLevel={15}
+        maxZoomLevel={19}
+      >
+        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} moveToGuestbook={moveToGuestbook} siteInRange={() => siteInRange(site)} />)}
+      </MapView>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#EFEFEF',
-    height: '100%'
+    height: '100%',
+    alignSelf: 'stretch', 
+    textAlign: 'center'
   },
   map: {
     width: Dimensions.get('window').width,
