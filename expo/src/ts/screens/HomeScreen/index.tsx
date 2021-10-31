@@ -126,6 +126,15 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
         <View style={styles.loginWrapper}>
           <Button
             style={styles.loginBtn}
+            title="Add New Post"
+            onPress={() =>
+              navigation.navigate('Record')
+            }
+          />
+        </View>
+        <View style={styles.loginWrapper}>
+          <Button
+            style={styles.loginBtn}
             title="Add New Site"
             onPress={() =>
               navigation.navigate('AddSite', {
@@ -175,8 +184,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginBtn: {
-    marginTop: 100,
     width: 200,
+    marginTop: 30,
   },
 });
 
