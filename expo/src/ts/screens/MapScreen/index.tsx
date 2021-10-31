@@ -29,6 +29,12 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
       longitude: location[1]
     }
   };
+  const [tooFarAway, setTooFarAway] = useState(false);
+  useEffect(() => {
+    if (tooFarAway) {
+      setTimeout(() => setTooFarAway(false), 3000);
+    }
+  }, [tooFarAway]);
 
   // initialize three
   let timeout!: number;
@@ -268,7 +274,7 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   //   );
   // };
   return (
-    <View style={styles.container}>
+    <View style={styles.container} pointerEvents={loading ? 'none' : 'auto'}>
       {/* { mapLoaded ? <AlertOverlay mode={mode} changeMode={changeMode} liveFirstLoad={liveFirstLoad} /> : null } */}
       { mapLoaded ?  <View style={{position: 'absolute', top: 100, left: 0, zIndex: 2, width: '100%', alignItems: 'center'}}>
         <View>
@@ -295,6 +301,14 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
           <View style={{}}>
             <View style={{backgroundColor: '#00AB67', padding: 10}}>
               <Text h4 h4Style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 14}}>Location: {loading ? 'Loading...' : (Object.keys(park).length === 0  ? 'Unknown' : park.name)}</Text> 
+            </View>
+          </View>
+        </View> : null }
+        { mapLoaded && tooFarAway ?  
+        <View style={{position: 'absolute', bottom: 50, left: 0, width: '100%', alignItems: 'center', zIndex: 2}}>
+          <View style={{}}>
+            <View style={{backgroundColor: '#00AB67', padding: 10}}>
+              <Text h4 h4Style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 14}}>You are too far away!</Text> 
             </View>
           </View>
         </View> : null }
@@ -372,7 +386,7 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
         minZoomLevel={15}
         maxZoomLevel={19}
       >
-        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} moveToGuestbook={moveToGuestbook} siteInRange={() => siteInRange(site)} />)}
+        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} moveToGuestbook={moveToGuestbook} siteInRange={() => siteInRange(site)} setTooFarAway={setTooFarAway}/>)}
       </MapView>
     </View>
   )

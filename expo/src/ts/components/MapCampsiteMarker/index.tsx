@@ -12,6 +12,9 @@ const MapCampsiteMarker = (props: any) => {
             onPress={() => {
                 if (inRange) {
                     props.moveToGuestbook(_id, name)
+                    props.setTooFarAway(false);
+                } else {
+                    props.setTooFarAway(true);
                 }
             }}>
                 <View style={{backgroundColor: (inRange ? "#E2C275ED" : "#FFAAC5ED"), padding: 5, width: 130, height: 130, borderRadius: 20, borderColor: 'white', borderWidth: 2,
