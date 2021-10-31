@@ -14,6 +14,7 @@ export type RootStackParamList = {
   };
   Me: undefined;
   Record: undefined;
+  AddPost: undefined;
 };
 
 type HomeScreenNavigationProp = NativeStackScreenProps<
@@ -36,6 +37,10 @@ type RecordScreenNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   "Record"
 >;
+type AddPostScreenNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  "AddPost"
+>;
 
 export {
   HomeScreenNavigationProp,
@@ -43,4 +48,5 @@ export {
   GuestbookScreenNavigationProp,
   PostScreenNavigationProp,
   RecordScreenNavigationProp,
+  AddPostScreenNavigationProp
 };

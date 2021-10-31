@@ -76,7 +76,7 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
           style={styles.btn}
           onPress={() => navigation.navigate("Record")}
         >
-          <Text style={styles.btnText}>Go to Camera</Text>
+          <Text style={styles.btnText}>Make a Post</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.btn}

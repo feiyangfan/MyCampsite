@@ -5,8 +5,9 @@ import { CameraType, WhiteBalance } from 'expo-camera/build/Camera.types';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
+import * as Types from "../../types";
 
-export default function RecordScreen() {
+const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) => {
   const [cameraPermission, setCameraPermission] = useState(false);
   const [audioPermission, setAudioPermission] = useState(false);
 
@@ -45,11 +46,13 @@ export default function RecordScreen() {
   const startRecording = async () => {
     if (cameraReference) {
       try {
-        const videoSettings = { maxDuration: 60, quality: Camera.Constants.VideoQuality['480'] }
+        const videoSettings = { maxDuration: 5, quality: Camera.Constants.VideoQuality['480'] }
         const recording = cameraReference.recordAsync(videoSettings)
         if (recording) {
           const data = await recording;
           const source = data.uri;
+          {/* Ignore this error. Typescript just odd*/}
+          navigation.navigate("AddPost", {source: source});
         }
       } catch (error) {
         console.warn(error)
@@ -147,3 +150,4 @@ const styles = StyleSheet.create({
     marginTop: 5,
   }
 });
+export default RecordScreen;
