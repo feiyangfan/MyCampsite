@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, {ReactNode, useEffect} from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ThemeProvider } from "react-native-elements";
@@ -6,6 +6,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import {Provider} from "react-redux";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./src/ts/lib/config";
+import {useAuth} from "./src/ts/lib/auth";
 import HomeScreen from "./src/ts/screens/HomeScreen";
 import MapScreen from "./src/ts/screens/MapScreen";
 import GuestbookScreen from "./src/ts/screens/GuestbookScreen";
@@ -21,10 +22,23 @@ import AddSiteScreen from './src/ts/screens/AddSiteScreen';
 
 initializeApp(firebaseConfig);
 
+const FirebaseAuthListener = (props: { children: ReactNode }) => {
+    const {addListener} = useAuth();
+
+    useEffect(() => {
+        const unsub = addListener();
+        return () => unsub();
+    }, []);
+
+    return <>{props.children}</>
+}
+
 const GlobalProviders = (props: { children: ReactNode }) => (
   <SafeAreaProvider>
     <Provider store={store}>
-      <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
+      <FirebaseAuthListener>
+        <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
+      </FirebaseAuthListener>
     </Provider>
   </SafeAreaProvider>
 );
@@ -34,15 +48,20 @@ const App = () => {
   return (
     <GlobalProviders>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator
+          initialRouteName="Home"
+          screenOptions={{
+            headerShown: true,
+            headerStyle: { backgroundColor: '#00AB67' },
+            headerTintColor: '#fff',
+            headerTitleStyle: { fontSize: 25, fontWeight: 'bold' },
+          }}
+        >
           <Stack.Group
             screenOptions={{
-              headerShown: true,
-              title: 'My Campsite',
-              headerStyle: { backgroundColor: '#00AB67' },
-              headerTintColor: '#fff',
-              headerTitleStyle: { fontSize: 25, fontWeight: 'bold' },
-            }}>
+              title: "My Campsite"
+            }}
+          >
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Map" component={MapScreen} />
             <Stack.Screen name="Guestbook" component={GuestbookScreen} />

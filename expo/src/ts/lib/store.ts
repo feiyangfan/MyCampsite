@@ -5,7 +5,16 @@ import authSlice from "./auth/slice"
 const reducer = combineReducers({
     auth: authSlice.reducer
 })
-const store = configureStore({reducer})
+const store = configureStore({
+    reducer,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: ["auth/signIn"],
+                ignoredPaths: ["auth.user"]
+            }
+        })
+})
 export default store
 
 export type RootState = ReturnType<typeof store.getState>

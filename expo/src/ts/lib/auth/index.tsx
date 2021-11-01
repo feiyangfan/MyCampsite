@@ -1,4 +1,4 @@
-import {User, getAuth, onAuthStateChanged, signOut as firebaseSignOut, signInWithCredential, AuthCredential,
+import {getAuth, onAuthStateChanged, signOut as firebaseSignOut, signInWithCredential, AuthCredential,
         GoogleAuthProvider, fetchSignInMethodsForEmail, createUserWithEmailAndPassword, sendPasswordResetEmail,
         sendEmailVerification, EmailAuthProvider} from "firebase/auth"
 import {useEffect, useState} from "react"
@@ -8,126 +8,130 @@ import {expoAuthConfig} from "../config"
 import {RootStackParamList} from "../../types"
 import {useAppDispatch, useAppSelector} from "../store"
 import authSlice from "./slice"
-import {fetch} from "../api"
 
-/**
- * Current firebase user, user value is only valid when ready is true
- */
-export const useUser = (): [User | null, boolean] => {
-    const auth = getAuth()
-    const [ready, setReady] = useState(false)
-    const [user, setUser] = useState(auth.currentUser)
+export const useAuth = () => {
+    const firebaseAuth = getAuth()
+    const global = useAppSelector(state => state.auth)
+    const dispatch = useAppDispatch()
 
-    useEffect(() => {
-        const unsub = onAuthStateChanged(auth, newUser => {
-            setUser(newUser)
-            if (!ready)
-                setReady(true)
+    const addListener = () =>
+        onAuthStateChanged(firebaseAuth, user => {
+            if (user)
+                dispatch(authSlice.actions.signIn(user))
+            else
+                dispatch(authSlice.actions.signOut())
         })
-        return () => unsub()
-    }, [])
 
-    return [user, ready]
+    const providerSignIn = async (cred: AuthCredential) => {
+        dispatch(authSlice.actions.setQuerying())
+        try {
+            const {operationType, providerId, user} = await signInWithCredential(firebaseAuth, cred)
+            console.log(`Firebase sign in: ${providerId}, op: ${operationType}, uid: ${user.uid}, verified: ${user.emailVerified}`)
+        }
+        catch (error) {
+            console.error(error)
+        }
+    }
+
+    const passwordSignIn = async (email: string, password: string) => {
+        dispatch(authSlice.actions.setQuerying())
+        try {
+            const methods = await fetchSignInMethodsForEmail(firebaseAuth, email)
+            if (methods.length == 0) {
+                const {user} = await createUserWithEmailAndPassword(firebaseAuth, email, password)
+                await sendEmailVerification(user)
+                console.log(`Firebase password sign up: ${user.uid}, email: ${user.email}`)
+            }
+            else
+                await providerSignIn(EmailAuthProvider.credential(email, password))
+        }
+        catch (error) {
+            console.error(error)
+        }
+    }
+
+    const signOut = async () => {
+        console.log(`Signing out: ${global.user?.email}`)
+        await firebaseSignOut(firebaseAuth)
+    }
+
+    return {addListener, providerSignIn, passwordSignIn, signOut, user: global.user, querying: global.querying}
 }
 
+/**
+ * accept - the user is logged in <br>
+ * wait - querying auth status <br>
+ * reject - the user should be locked out <br>
+ * defer - the user is not authenticated, but don't warn them yet <br>
+ */
 export enum AuthWallAction {
-    accepted,      // signed in
-    pending,       // authenticating
-    rejected,      // sign in refused
-    deferred       // not signed in, auth wall not shown
+    accept,
+    wait,
+    reject,
+    defer
 }
 
 /**
  * Hooks current user and auth wall interaction
  * @param presentImmediately present the auth wall right away without needing to call present
- * @return user: the current firebase user
  * @return authWallAction: auth wall decision
- * @return signIn/signOut: present the auth wall or sign out
+ * @return present: present the auth wall
  */
-export const useAuthWall = (presentImmediately = false) => {
-    const auth = getAuth()
+export const useAuthWall = (presentImmediately = false): [AuthWallAction, () => void] => {
     const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
-    const [user, ready] = useUser()
-    const [deferred, setDeferred] = useState(true)
-    const state = useAppSelector(state => state.auth)
-    const dispatch = useAppDispatch()
+    const [defer, setDefer] = useState(true)
+    const auth = useAuth()
+    const global = useAppSelector(state => state.auth)
 
-    let action = AuthWallAction.pending
-    if (ready && !state.authWallActive) {
-        if (state.requiredUID && state.requiredUID == user?.uid)
-            action = AuthWallAction.accepted
-        else if (user?.isAnonymous == false)
-            action = AuthWallAction.accepted
-        else if (deferred)
-            action = AuthWallAction.deferred
-        else
-            action = AuthWallAction.rejected
-    }
-
-    const signIn = () => {
-        setDeferred(false)
+    const present = () => {
+        setDefer(false)
         nav.navigate("SignIn")
-    }
-
-    const signOut = () => {
-        firebaseSignOut(auth)
-        dispatch(authSlice.actions.signOut())
     }
 
     useEffect(() => {
         if (presentImmediately)
-            signIn()
+            present()
     }, [])
 
-    return {user, authWallAction: action, signIn, signOut}
+    let action
+    if (auth.user?.isAnonymous == false)
+        action = AuthWallAction.accept
+    else if (auth.querying || global.authWallActive)
+        action = AuthWallAction.wait
+    else if (defer)
+        action = AuthWallAction.defer
+    else
+        action = AuthWallAction.reject
+
+    return [action, present]
 }
 
-// TODO reconsider
-const signInFromProvider = async (cred: AuthCredential) => {
-    const res = await signInWithCredential(getAuth(), cred)
-    console.log(`Firebase sign in: ${res.operationType}, using: ${res.providerId}, uid: ${res.user.uid}`)
-
-    // TODO temp solution
-    await fetch("/profile/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            create: true,
-            displayName: res.user.displayName
-        })
-    })
-}
-
-export const useGoogleSignInPrompt = () => {
+export const useGoogleSignIn = () => {
     const [, res, prompt] = Google.useIdTokenAuthRequest(expoAuthConfig.google)
+    const {providerSignIn} = useAuth()
 
     useEffect(() => {
         console.log(`Google OAuth response: ${res?.type}`)
         if (res?.type == "success")
-            signInFromProvider(GoogleAuthProvider.credential(res.params.id_token))
+            providerSignIn(GoogleAuthProvider.credential(res.params.id_token))
     }, [res])
 
     return prompt
 }
 
 export const usePasswordSignIn = () => {
-    const auth = getAuth()
+    const firebaseAuth = getAuth()
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const {passwordSignIn} = useAuth()
 
-    const passwordSignIn = async (email: string, password: string) => {
-        const methods = await fetchSignInMethodsForEmail(auth, email)
-        if (methods.length == 0) {
-            const {user} = await createUserWithEmailAndPassword(auth, email, password)
-            await sendEmailVerification(user)
-        }
-        else
-            signInFromProvider(EmailAuthProvider.credential(email, password))
+    const signIn = () => {
+        return passwordSignIn(email, password)
     }
 
-    const resetPassword = (email: string) => {
-        return sendPasswordResetEmail(auth, email)
+    const forgot = () => {
+        return sendPasswordResetEmail(firebaseAuth, email)
     }
 
-    return {passwordSignIn, resetPassword}
+    return {signIn, forgot, onChangeText: {email: setEmail, password: setPassword}}
 }
