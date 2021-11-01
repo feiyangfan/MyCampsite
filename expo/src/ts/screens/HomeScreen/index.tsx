@@ -140,6 +140,14 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
               })
             }
           />
+          <Button
+            style={styles.loginBtn}
+            buttonStyle={{backgroundColor: '#00AB67'}}
+            title="Add New Post"
+            onPress={() =>
+              navigation.navigate('Record')
+            }
+          />
           <Button style={styles.loginBtn} buttonStyle={{backgroundColor: '#00AB67'}} title="My Account" onPress={() => navigation.navigate('Me')} />
         </View>
       </View>
@@ -178,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginBtn: {
-    marginTop: 25,
+    marginTop: 15,
     width: 200
   }
 });
