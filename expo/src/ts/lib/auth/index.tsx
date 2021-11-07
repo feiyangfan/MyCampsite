@@ -30,6 +30,7 @@ export const useAuth = () => {
         }
         catch (error) {
             console.error(error)
+            dispatch(authSlice.actions.signOut())
         }
     }
 
@@ -47,6 +48,7 @@ export const useAuth = () => {
         }
         catch (error) {
             console.error(error)
+            dispatch(authSlice.actions.signOut())
         }
     }
 

@@ -4,9 +4,9 @@ import {Avatar, Card, Text} from "react-native-elements"
 import {useProfile} from "../lib/profile"
 
 const Profile = (props: {id?: string}) => {
-    const [profile, profileValid] = useProfile(props.id)
+    const {profile, querying} = useProfile(props.id)
 
-    if (!profileValid)
+    if (querying)
         return <ActivityIndicator color="blue" size="large" />
     return (
         <Card>

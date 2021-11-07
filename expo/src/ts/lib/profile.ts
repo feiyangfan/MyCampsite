@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react"
 import {fetch} from "./api"
+import {useAuth} from "./auth"
 
 export type PublicProfile = {
     id: string,
@@ -8,17 +9,35 @@ export type PublicProfile = {
     creationDate: Date
 }
 
-export const useProfile = (id?: string): [(PublicProfile | null), boolean] => {
-    const [valid, setValid] = useState(false)
-    const [profile, setProfile] = useState(null)
+export const useProfile = (id?: string) => {
+    const {user} = useAuth()
+    const [profile, setProfile] = useState<PublicProfile>()
+    const [querying, setQuerying] = useState(false)
 
     useEffect(() => {
+        if (!user)
+            return
+
+        setQuerying(true)
         fetch(id ? `/profile/${id}` : `/profile`)
             .then(res => res.json())
             .then(res => setProfile(res))
-            .then(() => setValid(true))
             .catch(error => console.error(error))
-    }, []) // TODO maybe use a debouncer instead
+            .finally(() => setQuerying(false))
+    }, [user])
 
-    return [profile, valid]
+    const update = (payload: any) => {
+        setQuerying(true)
+        return fetch(id ? `/profile/${id}` : `/profile`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(res => console.log(res))
+            .catch(error => console.error(error))
+            .finally(() => setQuerying(false))
+    }
+
+    return {profile, querying, update}
 }
