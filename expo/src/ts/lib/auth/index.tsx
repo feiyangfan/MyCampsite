@@ -1,9 +1,10 @@
 import {getAuth, onAuthStateChanged, signOut as firebaseSignOut, signInWithCredential, AuthCredential,
         GoogleAuthProvider, fetchSignInMethodsForEmail, createUserWithEmailAndPassword, sendPasswordResetEmail,
-        sendEmailVerification, EmailAuthProvider} from "firebase/auth"
+        sendEmailVerification, EmailAuthProvider, FacebookAuthProvider} from "firebase/auth"
 import {useEffect, useState} from "react"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
 import * as Google from "expo-auth-session/providers/google"
+import * as Facebook from "expo-auth-session/providers/facebook"
 import {expoAuthConfig} from "../config"
 import {RootStackParamList} from "../../types"
 import {useAppDispatch, useAppSelector} from "../store"
@@ -120,6 +121,19 @@ export const useGoogleSignIn = () => {
 
     return prompt
 }
+
+export const useFacebookSignIn = () => {
+    const [req, res, prompt] = Facebook.useAuthRequest(expoAuthConfig.facebook)
+    const {providerSignIn} = useAuth()
+
+    useEffect(() => {
+        console.log(`Facebook OAuth response: ${res?.type}`)
+        if (res?.type == "success")
+            providerSignIn(FacebookAuthProvider.credential(res.params.access_token))
+    }, [res])
+
+    return prompt
+};
 
 export const usePasswordSignIn = () => {
     const firebaseAuth = getAuth()

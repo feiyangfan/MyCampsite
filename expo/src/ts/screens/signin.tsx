@@ -1,7 +1,7 @@
 import React, {useEffect} from "react"
 import {View} from "react-native"
 import {Button, Input, Card} from "react-native-elements"
-import {usePasswordSignIn, useGoogleSignIn, useAuthWall, AuthWallAction} from "../lib/auth"
+import {usePasswordSignIn, useGoogleSignIn, useAuthWall, AuthWallAction, useFacebookSignIn} from "../lib/auth"
 import {NavigationProp, useNavigation} from "@react-navigation/native"
 import {RootStackParamList} from "../types"
 import {useAppDispatch} from "../lib/store"
@@ -12,6 +12,7 @@ const SignIn = () => {
     const nav = useNavigation<NavigationProp<RootStackParamList, "SignIn">>()
     const dispatch = useAppDispatch()
     const googleSignIn = useGoogleSignIn()
+    const facebookSignIn = useFacebookSignIn()
     const passwordSignIn = usePasswordSignIn()
 
     useEffect(() => {
@@ -42,7 +43,7 @@ const SignIn = () => {
                 <Card.Divider />
                 <View style={{height: 100, justifyContent: "space-between"}}>
                     <Button title="Sign In with Google" onPress={() => googleSignIn()} />
-                    <Button title="Sign In with Facebook" onPress={() => {}} />
+                    <Button title="Sign In with Facebook" onPress={() => facebookSignIn()} />
                 </View>
             </Card>
         </View>
