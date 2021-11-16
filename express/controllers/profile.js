@@ -1,5 +1,16 @@
 import Profile from "../models/Profile.js";
 
+const findOrCreateByUID = async (uid) => {
+    let profile = await Profile.findOne({uid});
+    if (profile)
+        return profile;
+    else if (!uid)
+        return null;
+    profile = new Profile({uid});
+    await profile.save();
+    return profile;
+};
+
 export const getProfile = (req, res, next) => {
     const id = req.params.id;
     const uid = req.auth?.uid;
@@ -11,7 +22,7 @@ export const getProfile = (req, res, next) => {
             .then(profile => res.json(profile))
             .catch(error => next(error));
     } else {
-        Profile.findOne({uid})
+        findOrCreateByUID(uid)
             .then(profile => res.json(profile))
             .catch(error => next(error));
     }

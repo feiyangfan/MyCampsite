@@ -2,26 +2,37 @@ import {createSlice, PayloadAction} from "@reduxjs/toolkit"
 import {User} from "firebase/auth"
 
 const initialState = {
+    listener: false,
+    querying: false,
+    user: null as User | null,
     authWallActive: false,
-    requiredUID: null as User["uid"] | null
 }
 
 const slice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        presentAuthWall: (state) => {
-            state.authWallActive = true
-            state.requiredUID = null
+        addListener: (state) => {
+            if (state.listener)
+                return
         },
 
-        dismissAuthWall: (state, action: PayloadAction<User["uid"] | null>) => {
-            state.authWallActive = false
-            state.requiredUID = action.payload
+        signIn: (state, action: PayloadAction<User>) => {
+            state.querying = false
+            state.user = action.payload
         },
 
         signOut: (state) => {
-            state.requiredUID = null
+            state.querying = false
+            state.user = null
+        },
+
+        setQuerying: (state) => {
+            state.querying = true
+        },
+
+        setAuthWallActive: (state, action: PayloadAction<boolean>) => {
+            state.authWallActive = action.payload
         }
     }
 })
