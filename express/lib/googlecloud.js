@@ -1,9 +1,11 @@
 import {initializeApp} from "firebase-admin/app";
 import {getAuth} from "firebase-admin/auth";
-import {firebaseConfig} from "../lib/config.js";
+import {Storage} from "@google-cloud/storage";
+import {v4 as uuid} from "uuid";
+import {cloudStorageConfig, firebaseConfig, cloudStorageBucket} from "./config.js";
 
 const app = initializeApp(firebaseConfig);
-console.log(`Firebase initialized: ${app.name}`);
+const storage = new Storage(cloudStorageConfig);
 
 export const authenticate = (must = false, admin = false) =>
     async (req, res, next) => {
@@ -17,14 +19,27 @@ export const authenticate = (must = false, admin = false) =>
 
             req.auth = {
                 uid: token.uid,
+                email: token.email,
                 emailVerified: token.email_verified
             };
             // TODO admin check
         }
         else {
-            req.auth = null
+            req.auth = null;
             if (must)
-                return res.sendStatus(401)
+                return res.sendStatus(401);
         }
-        next()
+        next();
     };
+
+export const uploadProfilePic = async (buf) => {
+    const bucket = storage.bucket(cloudStorageBucket.profilePics);
+    let file, fileExists;
+    do {
+        file = bucket.file(uuid());
+        [fileExists] = await file.exists();
+    } while (fileExists);
+
+    await file.save(buf);
+    return file;
+};

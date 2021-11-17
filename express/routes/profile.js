@@ -1,7 +1,7 @@
 import {Router} from "express";
-import {authenticate} from "../controllers/googlecloud.js";
-import {getProfile, setProfile} from "../controllers/profile.js";
 import bodyParser from "body-parser";
+import {authenticate} from "../lib/googlecloud.js";
+import {getProfile, setProfile} from "../controllers/profile.js";
 
 const router = Router();
 router.use(bodyParser.json());
