@@ -17,3 +17,15 @@ const fetchAPI: GlobalFetch["fetch"] = async (input, init?) => {
     return await fetch(input, {...init, headers})
 }
 export {fetchAPI as fetch}
+
+export const fetchJSON = (url: string, method = "GET", body = null) => {
+    const req: RequestInit = {
+        method
+    }
+    if (body) {
+        req.headers = {"Content-Type": "application/json"}
+        req.body = JSON.stringify(body)
+    }
+    return fetchAPI(url, req)
+        .then(res => res.json())
+}

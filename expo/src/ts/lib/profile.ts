@@ -1,26 +1,32 @@
 import {useEffect, useState} from "react"
-import {fetch} from "./api"
+import {fetchJSON} from "./api"
 import {useAuth} from "./auth"
 
+export type PrivateProfile = {
+    email?: string,
+    emailVerified?: boolean
+}
 export type PublicProfile = {
     id: string,
     uid: string,
     displayName?: string,
-    creationDate: Date
+    profilePicURL?: string,
+    creationDate: Date,
+    private?: PrivateProfile
 }
 
 export const useProfile = (id?: string) => {
     const {user} = useAuth()
     const [profile, setProfile] = useState<PublicProfile>()
     const [querying, setQuerying] = useState(false)
+    const url = id ? `/profile/${id}` : `/profile`
 
     useEffect(() => {
         if (!user)
             return
 
         setQuerying(true)
-        fetch(id ? `/profile/${id}` : `/profile`)
-            .then(res => res.json())
+        fetchJSON(url)
             .then(res => setProfile(res))
             .catch(error => console.error(error))
             .finally(() => setQuerying(false))
@@ -28,12 +34,7 @@ export const useProfile = (id?: string) => {
 
     const update = (payload: any) => {
         setQuerying(true)
-        return fetch(id ? `/profile/${id}` : `/profile`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
-        })
-            .then(res => res.json())
+        return fetchJSON(url, "POST", payload)
             .then(res => console.log(res))
             .catch(error => console.error(error))
             .finally(() => setQuerying(false))
