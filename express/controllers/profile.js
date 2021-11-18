@@ -1,19 +1,18 @@
 import PublicProfile from "../models/PublicProfile.js";
-import {findOrCreateByUID, copyProfilePic} from "../lib/profile.js";
+import {findOrCreateByUser, copyProfilePic} from "../lib/profile.js";
 
 export const getProfile = async (req, res, next) => {
-    const id = req.params.id;
-    const uid = req.auth?.uid;
+    const {params: {id}, user} = req;
 
-    if (!id && !uid)
+    if (!id && !user?.uid)
         return res.sendStatus(401);
 
     try {
-        const profile = id ? await PublicProfile.findById(id) : await findOrCreateByUID(uid);
-        if (profile.uid === req.auth?.uid) {
+        const profile = id ? await PublicProfile.findById(id) : await findOrCreateByUser(user);
+        if (profile.uid === user?.uid) {
             profile.private = {
-                email: req.auth?.email,
-                emailVerified: req.auth?.emailVerified
+                email: req.user?.email,
+                emailVerified: req.user?.emailVerified
             };
         }
         res.json(profile);
@@ -23,15 +22,11 @@ export const getProfile = async (req, res, next) => {
 };
 
 export const setProfile = async (req, res, next) => {
-    const {
-        params: {id},
-        body
-    } = req;
-    const uid = req.auth?.uid;
+    const {params: {id}, body, user} = req;
 
     try {
-        let profile = id ? await PublicProfile.findById(id) : await findOrCreateByUID(uid);
-        if (profile.uid !== req.auth?.uid)
+        let profile = id ? await PublicProfile.findById(id) : await findOrCreateByUser(user);
+        if (profile.uid !== user?.uid)
             return res.sendStatus(403);
 
         if (body.displayName)

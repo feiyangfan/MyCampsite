@@ -2,35 +2,29 @@ import fetch from "node-fetch";
 import PublicProfile from "../models/PublicProfile.js";
 import {uploadProfilePic} from "./googlecloud.js";
 
-export const findOrCreateByUID = async (uid) => {
-    let profile = await PublicProfile.findOne({uid});
+export const findOrCreateByUser = async (user) => {
+    let profile = await PublicProfile.findOne({uid: user?.uid});
     if (profile)
         return profile;
-    else if (!uid)
+    else if (!user)
         return null;
-    profile = new PublicProfile({uid});
+
+    profile = new PublicProfile({
+        uid: user.uid,
+        displayName: user.displayName,
+        profilePicURL: user.photoURL ? await copyProfilePic(user.photoURL) : null
+    });
     await profile.save();
     return profile;
 };
 
 export const copyProfilePic = async (payload) => {
     if (typeof payload === "string") {
-        try {
-            const res = await fetch(payload);
-            if (!res.headers.get("Content-Type").startsWith("image/"))
-                throw new Error("Image URL doesn't contain an image");
-            payload = await res.arrayBuffer();
-        }
-        catch (error) {
-            console.error(error);
-            return null;
-        }
+        const res = await fetch(payload);
+        if (!res.headers.get("Content-Type").startsWith("image/"))
+            throw new Error("Image URL doesn't contain an image");
+        payload = Buffer.from(await res.arrayBuffer());
     }
 
-    try {
-        return (await uploadProfilePic(payload)).publicUrl();
-    }
-    catch (error) {
-        return null;
-    }
+    return (await uploadProfilePic(payload)).publicUrl();
 };

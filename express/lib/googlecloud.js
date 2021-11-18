@@ -9,23 +9,20 @@ const storage = new Storage(cloudStorageConfig);
 
 export const authenticate = (must = false, admin = false) =>
     async (req, res, next) => {
+        const auth = getAuth();
         const idToken = req.get("X-Firebase-IDToken");
         if (idToken) {
-            const token = await getAuth()
+            const token = await auth
                 .verifyIdToken(idToken)
                 .catch(error => {
                     console.log(error.message);
                 });
 
-            req.auth = {
-                uid: token.uid,
-                email: token.email,
-                emailVerified: token.email_verified
-            };
+            req.user = await auth.getUser(token.uid);
             // TODO admin check
         }
         else {
-            req.auth = null;
+            req.user = null;
             if (must)
                 return res.sendStatus(401);
         }
