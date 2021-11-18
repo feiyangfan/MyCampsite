@@ -2,6 +2,11 @@ import fetch from "node-fetch";
 import PublicProfile from "../models/PublicProfile.js";
 import {uploadProfilePic} from "./googlecloud.js";
 
+/**
+ * Find or create a profile. When creating new profiles, user info is copied from the Firebase user
+ * @param user Firebase user
+ * @returns Promise<PublicProfile>
+ */
 export const findOrCreateByUser = async (user) => {
     let profile = await PublicProfile.findOne({uid: user?.uid});
     if (profile)
@@ -18,6 +23,11 @@ export const findOrCreateByUser = async (user) => {
     return profile;
 };
 
+/**
+ * Copies profile pic to cloud storage
+ * @param payload url or buffer
+ * @returns {Promise<string>}
+ */
 export const copyProfilePic = async (payload) => {
     if (typeof payload === "string") {
         const res = await fetch(payload);

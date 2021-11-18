@@ -7,6 +7,12 @@ import {cloudStorageConfig, firebaseConfig, cloudStorageBucket} from "./config.j
 const app = initializeApp(firebaseConfig);
 const storage = new Storage(cloudStorageConfig);
 
+/**
+ * Authenticates user and retrieves user info. <br>
+ * If user is authenticated, its info is stored in <code>request.user</code>
+ * @param must Send error response if not authenticated
+ * @param admin Same as above, but user must be admin
+ */
 export const authenticate = (must = false, admin = false) =>
     async (req, res, next) => {
         const auth = getAuth();
@@ -29,6 +35,11 @@ export const authenticate = (must = false, admin = false) =>
         next();
     };
 
+/**
+ * Create new file on cloud storage and copy data
+ * @param buf
+ * @returns {Promise<File>}
+ */
 export const uploadProfilePic = async (buf) => {
     const bucket = storage.bucket(cloudStorageBucket.profilePics);
     let file, fileExists;
