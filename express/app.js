@@ -14,6 +14,7 @@ const __dirname = path.dirname(__filename);
 import locationRouter from "./routes/location.js";
 import indexRouter from "./routes/index.js";
 import profileRouter from "./routes/profile.js";
+import postRouter from "./routes/post.js";
 import cors from "cors";
 
 const app = express();
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
 app.use("/", indexRouter);
 app.use("/location", locationRouter);
 app.use("/profile", profileRouter);
+app.use("/post", postRouter);
 
 /* Connect to our database */
 // Get the URI of the local database, or the one specified on deployment.
