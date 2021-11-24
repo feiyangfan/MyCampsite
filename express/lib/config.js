@@ -24,5 +24,6 @@ export const env = {
 };
 
 export const cloudStorageBucket = {
-    profilePics: `${env.resourcePrefix}-profile-pics-my-campsite-329022`
+    profilePics: `${env.resourcePrefix}-profile-pics-my-campsite-329022`,
+    postBlobs: `${env.resourcePrefix}-post-blob-my-campsite-329022`
 };

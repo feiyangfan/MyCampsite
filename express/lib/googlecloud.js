@@ -32,19 +32,24 @@ export const authenticate = (must = false) =>
         next();
     };
 
-/**
- * Create new file on cloud storage and copy data
- * @param buf
- * @returns {Promise<File>}
- */
-export const uploadProfilePic = async (buf) => {
-    const bucket = storage.bucket(cloudStorageBucket.profilePics);
+export const getEmptyFile = async (bucketName) => {
+    const bucket = storage.bucket(bucketName);
     let file, fileExists;
     do {
         file = bucket.file(uuid());
         [fileExists] = await file.exists();
     } while (fileExists);
 
+    return file;
+};
+
+/**
+ * Create new file on cloud storage and copy data
+ * @param buf
+ * @returns {Promise<File>}
+ */
+export const uploadProfilePic = async (buf) => {
+    const file = await getEmptyFile(cloudStorageBucket.profilePics);
     await file.save(buf);
     return file;
 };
