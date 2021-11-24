@@ -11,9 +11,8 @@ const storage = new Storage(cloudStorageConfig);
  * Authenticates user and retrieves user info. <br>
  * If user is authenticated, its info is stored in <code>request.user</code>
  * @param must Send error response if not authenticated
- * @param admin Same as above, but user must be admin
  */
-export const authenticate = (must = false, admin = false) =>
+export const authenticate = (must = false) =>
     async (req, res, next) => {
         const auth = getAuth();
         const idToken = req.get("X-Firebase-IDToken");
@@ -23,9 +22,7 @@ export const authenticate = (must = false, admin = false) =>
                 .catch(error => {
                     console.log(error.message);
                 });
-
             req.user = await auth.getUser(token.uid);
-            // TODO admin check
         }
         else {
             req.user = null;
