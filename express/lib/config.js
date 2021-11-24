@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
-import {cert} from "firebase-admin/app";
+import {initializeApp, cert} from "firebase-admin/app";
+import {Storage} from "@google-cloud/storage";
 
 dotenv.config();
 
@@ -18,12 +19,13 @@ else if (process.env.GCP_SERVICE_ACCOUNT_KEY_ASC) {
 }
 export {firebaseConfig, cloudStorageConfig};
 
-const prod = process.env.NODE_ENV === "production";
-export const env = {
-    resourcePrefix: prod ? "prod" : "devel"
-};
+const app = initializeApp(firebaseConfig);
+const storage = new Storage(cloudStorageConfig);
+
+const env = process.env.NODE_ENV;
+const resourcePrefix = env === "production" ? "prod" : "devel";
 
 export const cloudStorageBucket = {
-    profilePics: `${env.resourcePrefix}-profile-pics-my-campsite-329022`,
-    postBlobs: `${env.resourcePrefix}-post-blob-my-campsite-329022`
+    profilePics: storage.bucket(`${resourcePrefix}-profile-pics-my-campsite-329022`),
+    postBlobs: storage.bucket(`${resourcePrefix}-post-blob-my-campsite-329022`)
 };

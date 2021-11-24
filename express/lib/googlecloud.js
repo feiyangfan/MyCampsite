@@ -1,11 +1,6 @@
-import {initializeApp} from "firebase-admin/app";
 import {getAuth} from "firebase-admin/auth";
-import {Storage} from "@google-cloud/storage";
 import {v4 as uuid} from "uuid";
-import {cloudStorageConfig, firebaseConfig, cloudStorageBucket} from "./config.js";
-
-const app = initializeApp(firebaseConfig);
-const storage = new Storage(cloudStorageConfig);
+import {cloudStorageBucket} from "./config.js";
 
 /**
  * Authenticates user and retrieves user info. <br>
@@ -32,8 +27,7 @@ export const authenticate = (must = false) =>
         next();
     };
 
-export const getEmptyFile = async (bucketName) => {
-    const bucket = storage.bucket(bucketName);
+export const getEmptyFile = async (bucket) => {
     let file, fileExists;
     do {
         file = bucket.file(uuid());
