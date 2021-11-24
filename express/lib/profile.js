@@ -46,8 +46,14 @@ export const copyProfilePic = async (payload) => {
  */
 export const getProfile = (must = false, admin = false) => [
     authenticate(must),
-    async (req, res) => {
-        req.profile = await findOrCreateByUser(req.user);
-        // TODO admin check
+    async (req, res, next) => {
+        try {
+            req.profile = await findOrCreateByUser(req.user);
+            // TODO admin check
+        }
+        catch (error) {
+            next(error);
+        }
+        next();
     }
 ];

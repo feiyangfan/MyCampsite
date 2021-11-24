@@ -1,11 +1,6 @@
-import {initializeApp} from "firebase-admin/app";
 import {getAuth} from "firebase-admin/auth";
-import {Storage} from "@google-cloud/storage";
 import {v4 as uuid} from "uuid";
-import {cloudStorageConfig, firebaseConfig, cloudStorageBucket} from "./config.js";
-
-const app = initializeApp(firebaseConfig);
-const storage = new Storage(cloudStorageConfig);
+import {cloudStorageBucket} from "./config.js";
 
 /**
  * Authenticates user and retrieves user info. <br>
@@ -32,19 +27,23 @@ export const authenticate = (must = false) =>
         next();
     };
 
-/**
- * Create new file on cloud storage and copy data
- * @param buf
- * @returns {Promise<File>}
- */
-export const uploadProfilePic = async (buf) => {
-    const bucket = storage.bucket(cloudStorageBucket.profilePics);
+export const getEmptyFile = async (bucket) => {
     let file, fileExists;
     do {
         file = bucket.file(uuid());
         [fileExists] = await file.exists();
     } while (fileExists);
 
+    return file;
+};
+
+/**
+ * Create new file on cloud storage and copy data
+ * @param buf
+ * @returns {Promise<File>}
+ */
+export const uploadProfilePic = async (buf) => {
+    const file = await getEmptyFile(cloudStorageBucket.profilePics);
     await file.save(buf);
     return file;
 };
