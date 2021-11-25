@@ -36,7 +36,6 @@ jobs:
           echo "${{secrets.ANDROID_KEYSTORE_ASC}}" | base64 -d > keystore.jks
 
       - name: Build apk (production)
-        if: github.ref == 'prod-d3'
         run: |
           expo publish --release-channel prod-d3
           turtle build:android -o d3.apk -t apk --release-channel prod-d3 --keystore-path keystore.jks --keystore-alias d3
