@@ -5,8 +5,8 @@ import * as Location from 'expo-location';
 import * as geolib from 'geolib';
 
 import * as Types from '../../types';
-import GuestbookList from '../../components/GuestbookList';
 import WeatherWidget from '../../components/WeatherWidget';
+import GuestbookList from '../../components/GuestbookList';
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   const locationURL = 'http://mycampsite-team12.herokuapp.com/location';
