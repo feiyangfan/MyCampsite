@@ -5,7 +5,8 @@ let baseURL = "http://10.0.2.2:3000"
 if (releaseChannel.startsWith("prod-d2"))
     baseURL = "https://mycampsite-team12.herokuapp.com"
 else if (releaseChannel.startsWith("prod-d3"))
-    baseURL = "https://mycampsite-team12.herokuapp.com" // TODO change this
+    baseURL = "https://mycampsite-team12-d3.herokuapp.com"
+
 export const env = {
     releaseChannel,
     baseURL
