@@ -41,11 +41,10 @@ jobs:
       - name: Build apk (production)
         run: |
           expo publish --release-channel prod-d3
-          turtle build:android -o d3.apk -t apk --release-channel prod-d3 --keystore-path keystore.jks --keystore-alias d3
+          turtle build:android -o /tmp/d3.apk -t apk --release-channel prod-d3 --keystore-path keystore.jks --keystore-alias d3
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: d3.apk
-          path: |
-            *.apk
+          path: /tmp/d3.apk
