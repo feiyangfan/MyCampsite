@@ -6,6 +6,7 @@ import * as geolib from 'geolib';
 
 import * as Types from '../../types';
 import GuestbookList from '../../components/GuestbookList';
+import WeatherWidget from '../../components/WeatherWidget';
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   const locationURL = 'http://mycampsite-team12.herokuapp.com/location';
@@ -115,6 +116,7 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       <Image source={require('../../../../assets/images/lake.png')} style={{ width: '100%', height: 200 }} />
       <View style={styles.mainCard}>
         <Text style={styles.text}>Guestbooks near you:</Text>
+        <WeatherWidget temp={33} condition='Atmosphere' />
         <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
         <View style={styles.loginWrapper}>
           <Button
