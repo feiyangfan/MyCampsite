@@ -22,8 +22,18 @@ export {firebaseConfig, cloudStorageConfig};
 const app = initializeApp(firebaseConfig);
 const storage = new Storage(cloudStorageConfig);
 
-const env = process.env.NODE_ENV;
-const resourcePrefix = env === "production" ? "prod" : "devel";
+let resourcePrefix;
+switch (process.env.NODE_ENV) {
+    case "production":
+        resourcePrefix = "prod-d2";
+        break;
+    case "prod-d3":
+        resourcePrefix = "prod-d3";
+        break;
+    default:
+        resourcePrefix = "devel";
+        break;
+}
 
 export const cloudStorageBucket = {
     profilePics: storage.bucket(`${resourcePrefix}-profile-pics-my-campsite-329022`),
