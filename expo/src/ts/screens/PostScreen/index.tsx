@@ -1,61 +1,55 @@
 import React from "react";
 import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import * as Types from "../../types";
+import WeatherWidget from "../../components/WeatherWidget";
 
 const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
   const { post } = route.params;
-  const { postId, postLocation, date, content } = post;
+  const { postId, date, locationId, locationName, weather, notes, url, userId } = post;
 
-  console.log(post);
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>(PostId: {postId})</Text>
-      <Text style={styles.text}>
-        {postLocation}, {date}
-      </Text>
-      <Text style={styles.text}>{content}</Text>
-
-      <View style={styles.btnWrapper}>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={() => navigation.navigate("Home")}
-        >
-          <Text style={styles.btnText}>Go To Home</Text>
-        </TouchableOpacity>
+      <Text style={styles.siteName}>{locationName}</Text>
+      <Text style={styles.date}>{date.replace("\n", ", ")}</Text>
+      <WeatherWidget temp={weather.temp} condition={weather.condition} />
+      <View style={styles.contentContainer}>
+        <Text>content goes here</Text>
       </View>
+      <Text style={styles.text}>{notes}</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#334257",
+    backgroundColor: "#005131",
     color: "white",
     height: "100%",
     flexDirection: "column",
-    justifyContent: "space-evenly",
+    padding: 20,
+    alignItems: "center",
   },
+  siteName: {
+    fontSize: 50,
+    color: "white",
+    margin: 10,
+  },
+  date: { fontSize: 30, color: "white", textAlign: "center", margin: 10 },
   text: {
     fontSize: 20,
     textAlign: "center",
     color: "white",
+    margin: 10,
   },
-  btnWrapper: {
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  btnText: {
-    textAlign: "center",
-    color: "white",
-    fontSize: 20,
-  },
-  btn: {
-    backgroundColor: "grey",
-    borderWidth: 1,
+  contentContainer: {
+    margin: 10,
+    marginTop: 20,
+    width: 300,
+    height: 300,
+    backgroundColor: "white",
     borderRadius: 10,
-    padding: 7,
-    width: "50%",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

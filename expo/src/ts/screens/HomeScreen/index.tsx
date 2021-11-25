@@ -1,31 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { Button } from 'react-native-elements';
-import * as Location from 'expo-location';
-import * as geolib from 'geolib';
+import React, { useState, useEffect } from "react";
+import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { Button } from "react-native-elements";
+import * as Location from "expo-location";
+import * as geolib from "geolib";
 
-import * as Types from '../../types';
-import WeatherWidget from '../../components/WeatherWidget';
-import GuestbookList from '../../components/GuestbookList';
+import * as Types from "../../types";
+import GuestbookList from "../../components/GuestbookList";
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
-  const locationURL = 'http://mycampsite-team12.herokuapp.com/location';
+  const locationURL = "http://mycampsite-team12.herokuapp.com/location";
   const [nearbySites, setNearbySites] = useState<any[]>([]);
   const [allSites, setAllSites] = useState<any[]>([]);
   const [userLocation, setUserLocation] = useState<number[]>([]);
   const [nearestParkId, setNearestParkId] = useState();
   const [subscription, setSubscription] = useState<any>();
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const backgroundImg = '../../../../assets/images/lake.png';
+  const backgroundImg = "../../../../assets/images/lake.png";
 
   // Get location permissions, watch user's location, and initialize list of sites
   useEffect(() => {
     (async () => {
       // Get location permissions
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
         return;
       }
 
@@ -104,7 +103,7 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   // Navigate to the guestbook screen for the specified location
   // TODO: Change this function when database is connected
   const onGuestbookSelect = (locationId: any, locationName: String) => {
-    navigation.navigate('Guestbook', {
+    navigation.navigate("Guestbook", {
       locationId: locationId,
       locationName: locationName,
       posts: [], //Update this to read posts from database
@@ -113,30 +112,29 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../../../assets/images/lake.png')} style={{ width: '100%', height: 200 }} />
+      <Image source={require("../../../../assets/images/lake.png")} style={{ width: "100%", height: 200 }} />
       <View style={styles.mainCard}>
         <Text style={styles.text}>Guestbooks near you:</Text>
-        <WeatherWidget temp={33} condition='Atmosphere' />
         <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
         <View style={styles.loginWrapper}>
           <Button
             style={styles.loginBtn}
-            buttonStyle={{backgroundColor: '#00AB67'}}
+            buttonStyle={{ backgroundColor: "#00AB67" }}
             title="View Map (Demo)"
-            onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: true})}
+            onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })}
           />
           <Button
             style={styles.loginBtn}
-            buttonStyle={{backgroundColor: '#00AB67'}}
+            buttonStyle={{ backgroundColor: "#00AB67" }}
             title="View Map (Live)"
-            onPress={() => navigation.navigate('Map', {ignoreDeviceLocation: false})}
+            onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })}
           />
           <Button
             style={styles.loginBtn}
-            buttonStyle={{backgroundColor: '#00AB67'}}
+            buttonStyle={{ backgroundColor: "#00AB67" }}
             title="Add New Site"
             onPress={() =>
-              navigation.navigate('AddSite', {
+              navigation.navigate("AddSite", {
                 location: userLocation,
                 parkId: nearestParkId,
               })
@@ -144,13 +142,11 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
           />
           <Button
             style={styles.loginBtn}
-            buttonStyle={{backgroundColor: '#00AB67'}}
+            buttonStyle={{ backgroundColor: "#00AB67" }}
             title="Add New Post"
-            onPress={() =>
-              navigation.navigate('Record')
-            }
+            onPress={() => navigation.navigate("Record")}
           />
-          <Button style={styles.loginBtn} buttonStyle={{backgroundColor: '#00AB67'}} title="My Account" onPress={() => navigation.navigate('Me')} />
+          <Button style={styles.loginBtn} buttonStyle={{ backgroundColor: "#00AB67" }} title="My Account" onPress={() => navigation.navigate("Me")} />
         </View>
       </View>
     </View>
@@ -159,38 +155,38 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#005131',
-    color: 'white',
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
+    backgroundColor: "#005131",
+    color: "white",
+    height: "100%",
+    flexDirection: "column",
+    justifyContent: "flex-start",
   },
   text: {
     fontSize: 25,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 10,
     marginTop: 40,
-    textAlign: 'left',
-    color: 'white',
+    textAlign: "left",
+    color: "white",
   },
   mainCard: {
-    backgroundColor: '#005131',
-    color: 'white',
-    flexDirection: 'column',
+    backgroundColor: "#005131",
+    color: "white",
+    flexDirection: "column",
     height: 600,
-    position: 'relative',
+    position: "relative",
     top: -20,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 10,
   },
   loginWrapper: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   loginBtn: {
     marginTop: 15,
-    width: 200
-  }
+    width: 200,
+  },
 });
 
 export default HomeScreen;
