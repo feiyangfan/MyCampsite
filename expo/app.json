@@ -21,6 +21,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "ca.utoronto.csc301.fall2021.team12",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
