@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import * as geolib from 'geolib';
 
 import * as Types from '../../types';
+import WeatherWidget from '../../components/WeatherWidget';
 import GuestbookList from '../../components/GuestbookList';
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
@@ -115,6 +116,7 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       <Image source={require('../../../../assets/images/lake.png')} style={{ width: '100%', height: 200 }} />
       <View style={styles.mainCard}>
         <Text style={styles.text}>Guestbooks near you:</Text>
+        <WeatherWidget temp={33} condition='Atmosphere' />
         <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
         <View style={styles.loginWrapper}>
           <Button
