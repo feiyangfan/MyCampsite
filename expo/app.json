@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "My Campsite",
-    "slug": "my-campsite",
-    "scheme": "my-campsite",
+    "name": "My Campsite D3",
+    "slug": "my-campsite-d3",
+    "scheme": "my-campsite-d3",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
