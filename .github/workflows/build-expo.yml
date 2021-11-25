@@ -47,4 +47,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: d3.apk
-          path: d3.apk
+          path: |
+            *.apk
