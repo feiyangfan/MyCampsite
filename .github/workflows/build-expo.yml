@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - prod-d3
+  workflow_dispatch:
 
 jobs:
   Build:
