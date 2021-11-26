@@ -37,11 +37,8 @@ router.get("/:siteId?", async (req, res, next) => {
                 weatherTemp: post.weatherTemp,
                 weatherDesc: post.weatherDesc,
                 profile: post.profile,
-                file: post.file,
-                signedURL: post.signedURL,
-                publicURL: post.publicURL,
+                publicURL: cloudStorageBucket.postBlobs.file(post.file).publicUrl(),
                 createdAt: post.createdAt,
-                updatedAt: post.updatedAt
             };
             return newpost;
 
@@ -51,29 +48,20 @@ router.get("/:siteId?", async (req, res, next) => {
     res.json(filteredPosts);
 });
 
-// Sample Payload
-// {
-//     "siteId": "61a049a0dedb185a1ab51e48",
-//     "notes": "This is my campsite!",
-//     "weatherTemp": 10,
-//     "weatherDesc": "Clear"
-// }
 router.post("/", getProfile(true), async (req, res, next) => {
-    const {siteId, notes, weatherTemp, weatherDesc} = req.body;
-    const weatherDescriptions = ['Clear', 'Cloudy', 'Rainy', 'Snowy', 'Atmosphere'];
-    if (typeof notes !== "string" || typeof weatherTemp !== "number" || !weatherDescriptions.includes(weatherDesc)) {
-        return res.sendStatus(400);
-    }
+    const {siteId, notes} = req.body;
     try {
         // TODO prevent post and storage file spam
 
         const file = await getEmptyFile(cloudStorageBucket.postBlobs);
         const site = await Site.findById(siteId);
+        if (!site)
+            res.sendStatus(404);
         const post = await Post.create({
             siteId: site,
-            notes: notes,
-            weatherTemp: weatherTemp,
-            weatherDesc: weatherDesc,
+            notes: `${notes}`,
+            weatherTemp: 12,
+            weatherDesc: "Clear",
             profile: req.profile,
             file: file.name
         });
