@@ -7,8 +7,8 @@ const PostSchema = mongoose.Schema({
   weatherDesc: {type: String, enum: ['Clear', 'Cloudy', 'Rainy', 'Snowy', 'Atmosphere']},
   profile: {type: mongoose.Schema.Types.ObjectId, ref: "PublicProfile", required: true},
   file: {type: String, required: true},
-  signedURL: {type: String},
-  publicURL: {type: String}
+  creationDate: {type: Date, required: true, default: Date.now},
+  finishDate: {type: Date, default: null}
 }, {timestamps: true});
 
 export default mongoose.model("Post", PostSchema);
