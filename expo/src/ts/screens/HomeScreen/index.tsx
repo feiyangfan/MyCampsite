@@ -8,7 +8,7 @@ import * as Types from "../../types";
 import GuestbookList from "../../components/GuestbookList";
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
-  const locationURL = "http://mycampsite-team12.herokuapp.com/location";
+  const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
   const [nearbySites, setNearbySites] = useState<any[]>([]);
   const [allSites, setAllSites] = useState<any[]>([]);
   const [userLocation, setUserLocation] = useState<number[]>([]);
