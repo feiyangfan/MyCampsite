@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { Text, View, ScrollView, StyleSheet, Image } from "react-native";
 import { Button } from "react-native-elements";
 import * as Location from "expo-location";
 import * as geolib from "geolib";
@@ -8,11 +8,11 @@ import * as Types from "../../types";
 import GuestbookList from "../../components/GuestbookList";
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
-  const locationURL = "http://mycampsite-team12.herokuapp.com/location";
+  const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
   const [nearbySites, setNearbySites] = useState<any[]>([]);
   const [allSites, setAllSites] = useState<any[]>([]);
   const [userLocation, setUserLocation] = useState<number[]>([]);
-  const [nearestParkId, setNearestParkId] = useState();
+  const [nearestParkId, setNearestParkId] = useState("");
   const [subscription, setSubscription] = useState<any>();
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -74,9 +74,11 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
     });
 
     // Store nearest park
-    try {
+    if (parkArray.length === 0) {
+      setNearestParkId("61a04d58dedb185a1ab51ebe"); //Current ID of "None" park - may need to update
+    } else {
       setNearestParkId(parkArray[0]._id);
-    } catch (err) {}
+    }
 
     // Store sites from current list of parks (in case there is more than one):
     const sites: any[] = [];
@@ -102,8 +104,9 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
   // Navigate to the guestbook screen for the specified location
   // TODO: Change this function when database is connected
-  const onGuestbookSelect = (locationId: any, locationName: String) => {
+  const onGuestbookSelect = (parkId: any, locationId: any, locationName: String) => {
     navigation.navigate("Guestbook", {
+      parkId: parkId,
       locationId: locationId,
       locationName: locationName,
       posts: [], //Update this to read posts from database
@@ -112,43 +115,50 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../../../../assets/images/lake.png")} style={{ width: "100%", height: 200 }} />
-      <View style={styles.mainCard}>
-        <Text style={styles.text}>Guestbooks near you:</Text>
-        <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
-        <View style={styles.loginWrapper}>
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="View Map (Demo)"
-            onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })}
-          />
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="View Map (Live)"
-            onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })}
-          />
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="Add New Site"
-            onPress={() =>
-              navigation.navigate("AddSite", {
-                location: userLocation,
-                parkId: nearestParkId,
-              })
-            }
-          />
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="Add New Post"
-            onPress={() => navigation.navigate("Record")}
-          />
-          <Button style={styles.loginBtn} buttonStyle={{ backgroundColor: "#00AB67" }} title="My Account" onPress={() => navigation.navigate("Me")} />
+      <Image source={require("../../../../assets/images/lake.png")} style={styles.image} />
+      <ScrollView style={{ backgroundColor: "transparent" }}>
+        <View style={styles.mainCard}>
+          <Text style={styles.text}>Guestbooks near you:</Text>
+          <GuestbookList parkId={nearestParkId} locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
+          <View style={styles.loginWrapper}>
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="View Map (Demo)"
+              onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })}
+            />
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="View Map (Live)"
+              onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })}
+            />
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="Add New Site"
+              onPress={() =>
+                navigation.navigate("AddSite", {
+                  location: userLocation,
+                  parkId: nearestParkId,
+                })
+              }
+            />
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="Add New Post"
+              onPress={() => navigation.navigate("Record")}
+            />
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="My Account"
+              onPress={() => navigation.navigate("Me")}
+            />
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -160,6 +170,11 @@ const styles = StyleSheet.create({
     height: "100%",
     flexDirection: "column",
     justifyContent: "flex-start",
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    position: "absolute",
   },
   text: {
     fontSize: 25,
@@ -173,9 +188,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#005131",
     color: "white",
     flexDirection: "column",
-    height: 600,
+    flex: 1,
     position: "relative",
-    top: -20,
+    top: 170,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 10,

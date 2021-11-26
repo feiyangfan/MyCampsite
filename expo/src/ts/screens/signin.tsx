@@ -42,8 +42,8 @@ const SignIn = () => {
                 <Card.Title>Or</Card.Title>
                 <Card.Divider />
                 <View style={{height: 100, justifyContent: "space-between"}}>
-                    <Button title="Sign In with Google" onPress={() => googleSignIn()} />
-                    <Button title="Sign In with Facebook" onPress={() => facebookSignIn()} />
+                    <Button title="Sign In with Google" disabled={!googleSignIn} onPress={() => googleSignIn?.()} />
+                    <Button title="Sign In with Facebook" disabled={!facebookSignIn} onPress={() => facebookSignIn?.()} />
                 </View>
             </Card>
         </View>

@@ -7,23 +7,35 @@ dotenv.config();
 const firebaseConfig = {};
 const cloudStorageConfig = {};
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    const credential = cert(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-    firebaseConfig.credential = credential;
-    cloudStorageConfig.credential = credential;
+    console.log(`Using GCP service account credential: ${process.env.GOOGLE_APPLICATION_CREDENTIALS}`);
 }
 else if (process.env.GCP_SERVICE_ACCOUNT_KEY_ASC) {
-    const key = Buffer.from(process.env.GCP_SERVICE_ACCOUNT_KEY_ASC, "base64").toString();
-    const credential = cert(JSON.parse(key));
-    firebaseConfig.credential = credential;
-    cloudStorageConfig.credential = credential;
+    console.log("Loading GCP service account credential from environment");
+    const decoded = Buffer.from(process.env.GCP_SERVICE_ACCOUNT_KEY_ASC, "base64").toString();
+    const key = JSON.parse(decoded);
+    firebaseConfig.credential = cert(key);
+    cloudStorageConfig.projectId = key.project_id;
+    cloudStorageConfig.credentials = key;
 }
+else
+    throw new Error("Missing GCP service account credential");
 export {firebaseConfig, cloudStorageConfig};
 
 const app = initializeApp(firebaseConfig);
 const storage = new Storage(cloudStorageConfig);
 
-const env = process.env.NODE_ENV;
-const resourcePrefix = env === "production" ? "prod" : "devel";
+let resourcePrefix;
+switch (process.env.NODE_ENV) {
+    case "production":
+        resourcePrefix = "prod-d2";
+        break;
+    case "prod-d3":
+        resourcePrefix = "prod-d3";
+        break;
+    default:
+        resourcePrefix = "devel";
+        break;
+}
 
 export const cloudStorageBucket = {
     profilePics: storage.bucket(`${resourcePrefix}-profile-pics-my-campsite-329022`),

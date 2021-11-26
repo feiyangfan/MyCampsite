@@ -1,46 +1,101 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, TextInput } from 'react-native';
-import { Button } from 'react-native-elements';
-import * as Types from '../../types';
+import React, { useState, useEffect } from "react";
+import { Text, View, StyleSheet, TextInput } from "react-native";
+import { Button, ButtonGroup } from "react-native-elements";
+import * as Types from "../../types";
+
+const isAdmin = true; // For testing, give admin capability to all users. Must update later
 
 const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp) => {
   const { location, parkId } = route.params;
-  const locationURL = 'http://mycampsite-team12.herokuapp.com/location';
-  const [name, setName] = useState('');
-  const [radius, setRadius] = useState('');
+  const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
+  const [name, setName] = useState("");
+  const [park, setPark] = useState("");
+  const [radius, setRadius] = useState("");
+  const [type, setType] = useState("Campsite");
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const buttons = ["Campsite", "Point of Interest"];
+
+  // Get park name to suggest
+  useEffect(() => {
+    fetch(`${locationURL}/${parkId}`)
+      .then((data) => data.json())
+      .then((park) => {
+        park.name !== null ? setPark(park.name) : setPark("");
+      })
+      .catch((error) => console.log(error));
+  }, []);
+
+  // Attempt to find parkId based on user input
+  const findPark = (parkName: String) => {}; //TODO
+
+  const handleSelectType = (index: any) => {
+    setSelectedIndex(index);
+    if (index === 0) setType("campsite");
+    else if (index === 1) setType("point of interest");
+  };
 
   const handleAddSite = () => {
-    console.log(name, radius);
     try {
       fetch(`${locationURL}/${parkId}/site/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: name,
           location: {
             latitude: location[0],
             longitude: location[1],
-            radius: radius,
+            radius: radius ? Number.parseInt(radius) : 200,
+            type: type,
+            spotlight: false,
           },
         }),
       });
 
-      setName('');
-      setRadius('');
+      setName("");
+      setRadius("");
+      alert("Site added!");
     } catch (err) {
-      console.log('Add site failed');
+      alert("Add site failed");
     }
   };
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Add a new site at your current location:</Text>
-      <Text style={styles.text}> Site name: </Text>
-      <TextInput style={styles.input} placeholder={'Site name'} value={name} onChangeText={(name) => setName(name)} />
-      <Text style={styles.text}> Distance from which site can be viewed: </Text>
-      <TextInput style={styles.input} placeholder={'Range (metres)'} value={radius} onChangeText={(radius) => setRadius(radius)} />
+      <View style={styles.fieldContainer}>
+        <Text style={styles.text}> Park name: </Text>
+        <TextInput style={styles.input} placeholder={"Park name"} value={park} onChangeText={(park) => setPark(park)} />
+      </View>
+      <View style={styles.fieldContainer}>
+        <Text style={styles.text}> Site name: </Text>
+        <TextInput style={styles.input} placeholder={"Site name"} value={name} onChangeText={(name) => setName(name)} />
+      </View>
+
+      {isAdmin && (
+        <View style={{ width: "100%" }}>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.text}> Site type: </Text>
+            <View style={styles.buttonsContainer}>
+              <ButtonGroup
+                onPress={handleSelectType.bind(this)}
+                selectedIndex={selectedIndex}
+                buttons={buttons}
+                containerStyle={{ height: "100%", width: "100%", marginLeft: 0 }}
+                buttonContainerStyle={{ backgroundColor: "#00301D" }}
+                selectedButtonStyle={{ backgroundColor: "#00AB67" }}
+              />
+            </View>
+          </View>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.text}> Access radius: </Text>
+            <TextInput style={styles.input} placeholder={"Range (metres)"} value={radius} onChangeText={(radius) => setRadius(radius)} />
+          </View>
+        </View>
+      )}
+
       <Button buttonStyle={styles.addBtn} titleStyle={styles.btnText} title="Add Site" onPress={handleAddSite} />
     </View>
   );
@@ -48,41 +103,53 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#005131',
-    color: 'white',
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    backgroundColor: "#005131",
+    color: "white",
+    height: "100%",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  fieldContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginVertical: 15,
   },
   text: {
-    fontSize: 20,
-    textAlign: 'left',
-    color: 'white',
-    marginTop: 20,
+    fontSize: 24,
+    textAlign: "left",
+    color: "white",
   },
-
+  buttonsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "70%",
+    height: 40,
+    fontSize: 25,
+    marginTop: 15,
+  },
   addBtn: {
-    marginTop: 100,
     width: 200,
-    backgroundColor: '#FFF',
+    marginTop: 20,
+    backgroundColor: "#FFF",
   },
   btnText: {
-    color: '#005131',
-    fontWeight: 'bold',
+    color: "#005131",
+    fontWeight: "bold",
   },
   header: {
     margin: 20,
-    fontSize: 25,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
   },
   input: {
-    backgroundColor: '#fff',
-    width: '85%',
+    backgroundColor: "#fff",
+    width: "85%",
     height: 40,
     fontSize: 20,
-    marginVertical: 10,
+    marginTop: 10,
     paddingHorizontal: 10,
   },
 });

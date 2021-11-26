@@ -110,7 +110,7 @@ export const useAuthWall = (presentImmediately = false): [AuthWallAction, () => 
 }
 
 export const useGoogleSignIn = () => {
-    const [, res, prompt] = Google.useIdTokenAuthRequest(expoAuthConfig.google)
+    const [req, res, prompt] = Google.useIdTokenAuthRequest(expoAuthConfig.google)
     const {providerSignIn} = useAuth()
 
     useEffect(() => {
@@ -119,7 +119,7 @@ export const useGoogleSignIn = () => {
             providerSignIn(GoogleAuthProvider.credential(res.params.id_token))
     }, [res])
 
-    return prompt
+    return req ? prompt : null
 }
 
 export const useFacebookSignIn = () => {
@@ -132,7 +132,7 @@ export const useFacebookSignIn = () => {
             providerSignIn(FacebookAuthProvider.credential(res.params.access_token))
     }, [res])
 
-    return prompt
+    return req ? prompt : null
 };
 
 export const usePasswordSignIn = () => {

@@ -9,6 +9,8 @@ npm-debug.*
 *.orig.*
 web-build/
 .idea
+secret
+*.apk
 
 # macOS
 .DS_Store
