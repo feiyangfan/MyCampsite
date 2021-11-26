@@ -1,10 +1,14 @@
-import { typeAlias } from "@babel/types";
-import React from "react";
-import { Text, View, TouchableOpacity, StyleSheet, Image, FlatList } from "react-native";
+import React, { useState } from "react";
+import { Text, View, TouchableOpacity, StyleSheet, Image, FlatList, Alert } from "react-native";
 import { Icon } from "react-native-elements";
 import * as Types from "../../types";
+const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
+
+const isAdmin = true; // Temporary
 
 const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationProp) => {
+  const { parkId, locationId, locationName } = route.params;
+
   // dummy posts for testing UI
   const posts = [
     {
@@ -48,13 +52,36 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
       userId: 1,
     },
   ];
-  const { locationId, locationName } = route.params;
+
+  const showConfirmDialog = () => {
+    return Alert.alert("Delete site", "Are you sure you want to delete this site?", [
+      {
+        text: "Yes",
+        onPress: () => {
+          deleteSite(parkId, locationId);
+          alert("Site deleted!");
+        },
+      },
+      { text: "No" },
+    ]);
+  };
+
+  const deleteSite = (parkId: any, locationId: any) => {
+    try {
+      fetch(`${locationURL}/${parkId}/site/${locationId}`, {
+        method: "DELETE",
+      });
+    } catch (err) {
+      alert("Failed to delete site");
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Image source={require("../../../../assets/images/lake.png")} style={{ width: "100%", height: 200 }} />
       <View style={styles.mainCard}>
         <Text style={styles.text}>{locationName} Guestbook</Text>
+
         <View style={styles.addPost}>
           <Icon name="add-circle" color="#fff" size={40} style={{ paddingRight: 10 }} onPress={() => navigation.navigate("Record")} />
           <Text style={styles.text}>Add an Entry</Text>
@@ -73,6 +100,13 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
             numColumns={3}
           />
         </View>
+
+        {isAdmin && (
+          <View style={styles.deleteSite}>
+            <Icon name="remove-circle-outline" color="red" size={30} style={{ paddingRight: 10 }} onPress={showConfirmDialog} />
+            <Text style={styles.text}>Delete this site</Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -105,6 +139,7 @@ const styles = StyleSheet.create({
     margin: 7,
   },
   addPost: { flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 10 },
+  deleteSite: { flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 10 },
   btnText: {
     textAlign: "center",
     color: "white",

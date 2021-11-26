@@ -63,10 +63,7 @@ export const getAllSites = async (req, res) => {
 export const getSiteById = async (req, res) => {
   try {
     const foundPark = await Park.findById(req.params.parkId);
-    console.log(foundPark);
-    const foundSite = foundPark.sites.find(
-      (site) => site._id == req.params.siteId
-    ); //TODO: I don't know how to query mongoDB for this
+    const foundSite = foundPark.sites.find((site) => site._id == req.params.siteId); //TODO: I don't know how to query mongoDB for this
 
     res.json(foundSite);
   } catch (err) {
@@ -80,7 +77,6 @@ export const addSite = async (req, res) => {
     name: req.body.name,
     location: req.body.location,
   });
-  console.log(newSite);
 
   try {
     const foundPark = await Park.findById(req.params.parkId);
@@ -96,9 +92,7 @@ export const addSite = async (req, res) => {
 export const deleteSiteById = async (req, res) => {
   try {
     const foundPark = await Park.findById(req.params.parkId);
-    const index = foundPark.sites
-      .map((site) => site._id.toString())
-      .indexOf(req.params.siteId);
+    const index = foundPark.sites.map((site) => site._id.toString()).indexOf(req.params.siteId);
     if (index < 0) {
       res.sendStatus(400);
       return;
