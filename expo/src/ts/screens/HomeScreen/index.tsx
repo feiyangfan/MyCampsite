@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { Text, View, ScrollView, StyleSheet, Image } from "react-native";
 import { Button } from "react-native-elements";
 import * as Location from "expo-location";
 import * as geolib from "geolib";
@@ -115,43 +115,50 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../../../../assets/images/lake.png")} style={{ width: "100%", height: 200 }} />
-      <View style={styles.mainCard}>
-        <Text style={styles.text}>Guestbooks near you:</Text>
-        <GuestbookList parkId={nearestParkId} locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
-        <View style={styles.loginWrapper}>
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="View Map (Demo)"
-            onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })}
-          />
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="View Map (Live)"
-            onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })}
-          />
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="Add New Site"
-            onPress={() =>
-              navigation.navigate("AddSite", {
-                location: userLocation,
-                parkId: nearestParkId,
-              })
-            }
-          />
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="Add New Post"
-            onPress={() => navigation.navigate("Record")}
-          />
-          <Button style={styles.loginBtn} buttonStyle={{ backgroundColor: "#00AB67" }} title="My Account" onPress={() => navigation.navigate("Me")} />
+      <Image source={require("../../../../assets/images/lake.png")} style={styles.image} />
+      <ScrollView style={{ backgroundColor: "transparent" }}>
+        <View style={styles.mainCard}>
+          <Text style={styles.text}>Guestbooks near you:</Text>
+          <GuestbookList parkId={nearestParkId} locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
+          <View style={styles.loginWrapper}>
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="View Map (Demo)"
+              onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })}
+            />
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="View Map (Live)"
+              onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })}
+            />
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="Add New Site"
+              onPress={() =>
+                navigation.navigate("AddSite", {
+                  location: userLocation,
+                  parkId: nearestParkId,
+                })
+              }
+            />
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="Add New Post"
+              onPress={() => navigation.navigate("Record")}
+            />
+            <Button
+              style={styles.loginBtn}
+              buttonStyle={{ backgroundColor: "#00AB67" }}
+              title="My Account"
+              onPress={() => navigation.navigate("Me")}
+            />
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -163,6 +170,11 @@ const styles = StyleSheet.create({
     height: "100%",
     flexDirection: "column",
     justifyContent: "flex-start",
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    position: "absolute",
   },
   text: {
     fontSize: 25,
@@ -176,9 +188,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#005131",
     color: "white",
     flexDirection: "column",
-    height: 600,
+    flex: 1,
     position: "relative",
-    top: -20,
+    top: 170,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 10,

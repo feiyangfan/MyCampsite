@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import GuestbookCard from "../GuestbookCard";
 
 const GuestbookList = (props: any) => {
@@ -14,17 +14,21 @@ const GuestbookList = (props: any) => {
   } else {
     return (
       <View style={styles.guestbookList}>
-        {locations.map((location: any) => {
-          return (
+        <FlatList
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          data={locations}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={({ item }) => (
             <GuestbookCard
-              key={location._id}
+              key={item._id}
               onGuestbookSelect={props.onGuestbookSelect}
               parkId={parkId}
-              locationName={location.name}
-              locationId={location._id}
+              locationName={item.name}
+              locationId={item._id}
             />
-          );
-        })}
+          )}
+        />
       </View>
     );
   }
