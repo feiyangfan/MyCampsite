@@ -14,6 +14,7 @@ else if (process.env.GCP_SERVICE_ACCOUNT_KEY_ASC) {
     const decoded = Buffer.from(process.env.GCP_SERVICE_ACCOUNT_KEY_ASC, "base64").toString();
     const key = JSON.parse(decoded);
     firebaseConfig.credential = cert(key);
+    cloudStorageConfig.projectId = key.project_id;
     cloudStorageConfig.credentials = key;
 }
 else
