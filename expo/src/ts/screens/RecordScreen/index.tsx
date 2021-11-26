@@ -46,7 +46,7 @@ const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) =
   const startRecording = async () => {
     if (cameraReference) {
       try {
-        const videoSettings = { maxDuration: 5, quality: Camera.Constants.VideoQuality['480'] }
+        const videoSettings = { maxDuration: 60, quality: Camera.Constants.VideoQuality['480'] }
         const recording = cameraReference.recordAsync(videoSettings)
         if (recording) {
           const data = await recording;
@@ -108,13 +108,11 @@ const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 30,
   },
   camera: {
     flex: 1,
-    backgroundColor: '#FF0000',
-    aspectRatio: 9 / 16,
-
+    alignItems: 'center',
+    justifyContent:'flex-end',
   },
   btmContainer: {
     alignItems: 'center',
