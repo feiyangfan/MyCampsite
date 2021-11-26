@@ -2,7 +2,7 @@
   "expo": {
     "name": "My Campsite",
     "slug": "my-campsite",
-    "scheme": "my-campsite",
+    "scheme": "ca.utoronto.csc301.fall2021.team12",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
