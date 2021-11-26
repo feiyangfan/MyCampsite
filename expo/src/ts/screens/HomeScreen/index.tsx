@@ -6,6 +6,7 @@ import * as geolib from "geolib";
 
 import * as Types from "../../types";
 import GuestbookList from "../../components/GuestbookList";
+import Spotlight from "../../components/Spotlight";
 
 const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
@@ -116,6 +117,8 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       <View style={styles.mainCard}>
         <Text style={styles.text}>Guestbooks near you:</Text>
         <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
+        <Text style={styles.text}>Spotlight:</Text>
+        <Spotlight sites={allSites} onSpotlightSelect={onGuestbookSelect} />
         <View style={styles.loginWrapper}>
           <Button
             style={styles.loginBtn}
