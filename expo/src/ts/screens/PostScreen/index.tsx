@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  deletePost: { flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 10, marginTop: 50 },
+  deletePost: { flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 10, marginTop: "auto" },
 });
 
 export default PostScreen;

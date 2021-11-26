@@ -86,6 +86,8 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
     setAllSites(sites);
   };
 
+  const updateSiteList = (parkId: any) => {};
+
   // Return true if the user is in range of a given site, false otherwise.
   const siteInRange = (site: any) => {
     const distance = geolib.getPreciseDistance(
@@ -116,26 +118,15 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   return (
     <View style={styles.container}>
       <Image source={require("../../../../assets/images/lake.png")} style={styles.image} />
-      <ScrollView style={{ backgroundColor: "transparent" }}>
+      <ScrollView style={{ backgroundColor: "transparent", height: "100%" }} nestedScrollEnabled={true}>
         <View style={styles.mainCard}>
           <Text style={styles.text}>Guestbooks near you:</Text>
           <GuestbookList parkId={nearestParkId} locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
-          <View style={styles.loginWrapper}>
+          <View style={styles.buttonWrapper}>
+            <Button buttonStyle={styles.button} title="View Map (Demo)" onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })} />
+            <Button buttonStyle={styles.button} title="View Map (Live)" onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })} />
             <Button
-              style={styles.loginBtn}
-              buttonStyle={{ backgroundColor: "#00AB67" }}
-              title="View Map (Demo)"
-              onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })}
-            />
-            <Button
-              style={styles.loginBtn}
-              buttonStyle={{ backgroundColor: "#00AB67" }}
-              title="View Map (Live)"
-              onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })}
-            />
-            <Button
-              style={styles.loginBtn}
-              buttonStyle={{ backgroundColor: "#00AB67" }}
+              buttonStyle={styles.button}
               title="Add New Site"
               onPress={() =>
                 navigation.navigate("AddSite", {
@@ -144,18 +135,8 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
                 })
               }
             />
-            <Button
-              style={styles.loginBtn}
-              buttonStyle={{ backgroundColor: "#00AB67" }}
-              title="Add New Post"
-              onPress={() => navigation.navigate("Record")}
-            />
-            <Button
-              style={styles.loginBtn}
-              buttonStyle={{ backgroundColor: "#00AB67" }}
-              title="My Account"
-              onPress={() => navigation.navigate("Me")}
-            />
+            <Button buttonStyle={styles.button} title="Add New Post" onPress={() => navigation.navigate("Record")} />
+            <Button buttonStyle={styles.button} title="My Account" onPress={() => navigation.navigate("Me")} />
           </View>
         </View>
       </ScrollView>
@@ -194,13 +175,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 10,
+    height: 1000,
   },
-  loginWrapper: {
+  buttonWrapper: {
     alignItems: "center",
   },
-  loginBtn: {
-    marginTop: 15,
+  button: {
+    margin: 15,
     width: 200,
+    backgroundColor: "#00AB67",
   },
 });
 
