@@ -62,8 +62,9 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
         <View style={styles.listContainer}>
           <FlatList
             data={posts}
+            keyExtractor={(item) => item.postId.toString()}
             renderItem={({ item }) => (
-              <View key={item.postId}>
+              <View>
                 <TouchableOpacity style={styles.postThumbnail} onPress={() => navigation.navigate("Post", { post: item })}>
                   <Text style={styles.btnText}>{item.date}</Text>
                 </TouchableOpacity>
