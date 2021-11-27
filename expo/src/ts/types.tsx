@@ -22,6 +22,7 @@ export type RootStackParamList = {
   Me: undefined;
   Record: undefined;
   AddPost: undefined;
+  NewEntry: { parkId: any; locationId: any };
 };
 
 type HomeScreenNavigationProp = NativeStackScreenProps<RootStackParamList, "Home">;

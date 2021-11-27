@@ -83,7 +83,13 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
         <Text style={styles.text}>{locationName} Guestbook</Text>
 
         <View style={styles.addPost}>
-          <Icon name="add-circle" color="#fff" size={40} style={{ paddingRight: 10 }} onPress={() => navigation.navigate("Record")} />
+          <Icon
+            name="add-circle"
+            color="#fff"
+            size={40}
+            style={{ paddingRight: 10 }}
+            onPress={() => navigation.navigate("NewEntry", { parkId: parkId, locationId: locationId })}
+          />
           <Text style={styles.text}>Add an Entry</Text>
         </View>
         <View style={styles.listContainer}>

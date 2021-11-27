@@ -135,7 +135,6 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
                 })
               }
             />
-            <Button buttonStyle={styles.button} title="Add New Post" onPress={() => navigation.navigate("Record")} />
             <Button buttonStyle={styles.button} title="My Account" onPress={() => navigation.navigate("Me")} />
           </View>
         </View>
