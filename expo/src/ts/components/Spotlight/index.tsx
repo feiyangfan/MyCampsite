@@ -47,12 +47,12 @@ const Spotlight = (props: any) => {
   const filteredSites = sites.filter((site) => {
     return site.spotlight === true;
   });
-
+  
   if (filteredSites.length == 0) {
     return (
       <View style={styles.container}>
         <Text style={styles.text}>
-          No spotlights found - not near any spotlight sites!
+          No spotlights found - not near any spotlights!
         </Text>
       </View>
     );
