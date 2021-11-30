@@ -13,6 +13,19 @@ const router = Router();
 
 router.use(bodyParser.json());
 
+const postResponseBody = (post) => (
+    {
+        id: post._id,
+        siteId: post.siteId,
+        notes: post.notes,
+        weatherTemp: post.weatherTemp,
+        weatherDesc: post.weatherDesc,
+        profile: post.profile,
+        publicURL: cloudStorageBucket.postBlobs.file(post.file).publicUrl(),
+        createdAt: post.createdAt,
+    }
+);
+
 // show all posts
 router.get("/:siteId?", async (req, res, next) => {
     if (!ObjectId.isValid(req.params.siteId)) {
@@ -29,19 +42,7 @@ router.get("/:siteId?", async (req, res, next) => {
         const park = await Park.findOne({"sites._id": siteId});
         if (park) {
             const site = park.sites.find(site => site._id.toString() == siteId.toString());
-            const newpost = {
-                _id: post._id,
-                siteId: post.siteId,
-                siteName: site.name,
-                notes: post.notes,
-                weatherTemp: post.weatherTemp,
-                weatherDesc: post.weatherDesc,
-                profile: post.profile,
-                publicURL: cloudStorageBucket.postBlobs.file(post.file).publicUrl(),
-                createdAt: post.createdAt,
-            };
-            return newpost;
-
+            return postResponseBody(post);
         }
         return {};
     }));
@@ -94,7 +95,7 @@ router.post("/:id", getProfile(true), async (req, res, next) => {
         // TODO other edits
 
         await post.save();
-        return res.json(post);
+        return res.json(postResponseBody(post));
     }
     catch (error) {
         next(error);
