@@ -18,12 +18,13 @@ const NewEntryScreen = ({ route, navigation }: Types.NewEntryScreenNavigationPro
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ siteId: route.params.locationId, notes: notes }),
-      });
-      alert("Post submitted!");
-      navigation.navigate("Guestbook", {
-        parkId: route.params.parkId,
-        locationId: route.params.locationId,
-        locationName: route.params.locationName,
+      }).then((response) => {
+        alert("Post submitted!");
+        navigation.navigate("Guestbook", {
+          parkId: route.params.parkId,
+          locationId: route.params.locationId,
+          locationName: route.params.locationName,
+        });
       });
     } catch (err) {
       alert("Post failed");
@@ -32,7 +33,7 @@ const NewEntryScreen = ({ route, navigation }: Types.NewEntryScreenNavigationPro
 
   return (
     <View style={{ backgroundColor: "#005131" }}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView keyboardShouldPersistTaps="never" contentContainerStyle={styles.container}>
         <Text style={styles.header}> {route.params.locationName} Guestbook </Text>
         <Text style={styles.text}> Create entry: </Text>
         <View style={styles.iconContainer}>
