@@ -4,14 +4,16 @@ import { View, ScrollView, Text, StyleSheet, TextInput } from "react-native";
 import { Icon } from "react-native-elements";
 import { Button } from "react-native-elements";
 import * as Types from "../../types";
-import { fetch } from "../../lib/api";
+// import { fetch } from "../../lib/api";
 
 const NewEntryScreen = ({ route, navigation }: Types.NewEntryScreenNavigationProp) => {
+  const postURL = "http://mycampsite-team12-d3.herokuapp.com/post";
+
   const [notes, setNotes] = useState("");
 
   const createPost = () => {
     try {
-      fetch("/post", {
+      fetch(`${postURL}/post`, {
         method: "POST",
         headers: {
           Accept: "application/json",

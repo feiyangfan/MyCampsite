@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, TextInput } from "react-native";
+import { Text, View, StyleSheet, TextInput, ScrollView } from "react-native";
 import { Button, ButtonGroup } from "react-native-elements";
 import * as Types from "../../types";
 
@@ -63,40 +63,42 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
     }
   };
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Add a new site at your current location:</Text>
-      <View style={styles.fieldContainer}>
-        <Text style={styles.text}> Park name: </Text>
-        <TextInput style={styles.input} placeholder={"Park name"} value={park} onChangeText={(park) => setPark(park)} />
-      </View>
-      <View style={styles.fieldContainer}>
-        <Text style={styles.text}> Site name: </Text>
-        <TextInput style={styles.input} placeholder={"Site name"} value={name} onChangeText={(name) => setName(name)} />
-      </View>
+    <View style={{ backgroundColor: "#005131" }}>
+      <ScrollView keyboardShouldPersistTaps="never" contentContainerStyle={styles.container}>
+        <Text style={styles.header}>Add a new site at your current location:</Text>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.text}> Park name: </Text>
+          <TextInput style={styles.input} placeholder={"Park name"} value={park} onChangeText={(park) => setPark(park)} />
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.text}> Site name: </Text>
+          <TextInput style={styles.input} placeholder={"Site name"} value={name} onChangeText={(name) => setName(name)} />
+        </View>
 
-      {isAdmin && (
-        <View style={{ width: "100%" }}>
-          <View style={styles.fieldContainer}>
-            <Text style={styles.text}> Site type: </Text>
-            <View style={styles.buttonsContainer}>
-              <ButtonGroup
-                onPress={handleSelectType.bind(this)}
-                selectedIndex={selectedIndex}
-                buttons={buttons}
-                containerStyle={{ height: "100%", width: "100%", marginLeft: 0 }}
-                buttonContainerStyle={{ backgroundColor: "#00301D" }}
-                selectedButtonStyle={{ backgroundColor: "#00AB67" }}
-              />
+        {isAdmin && (
+          <View style={{ width: "100%" }}>
+            <View style={styles.fieldContainer}>
+              <Text style={styles.text}> Site type: </Text>
+              <View style={styles.buttonsContainer}>
+                <ButtonGroup
+                  onPress={handleSelectType.bind(this)}
+                  selectedIndex={selectedIndex}
+                  buttons={buttons}
+                  containerStyle={{ height: "100%", width: "100%", marginLeft: 0 }}
+                  buttonContainerStyle={{ backgroundColor: "#00301D" }}
+                  selectedButtonStyle={{ backgroundColor: "#00AB67" }}
+                />
+              </View>
+            </View>
+            <View style={styles.fieldContainer}>
+              <Text style={styles.text}> Access radius: </Text>
+              <TextInput style={styles.input} placeholder={"Range (metres)"} value={radius} onChangeText={(radius) => setRadius(radius)} />
             </View>
           </View>
-          <View style={styles.fieldContainer}>
-            <Text style={styles.text}> Access radius: </Text>
-            <TextInput style={styles.input} placeholder={"Range (metres)"} value={radius} onChangeText={(radius) => setRadius(radius)} />
-          </View>
-        </View>
-      )}
+        )}
 
-      <Button buttonStyle={styles.addBtn} titleStyle={styles.btnText} title="Add Site" onPress={handleAddSite} />
+        <Button buttonStyle={styles.addBtn} titleStyle={styles.btnText} title="Add Site" onPress={handleAddSite} />
+      </ScrollView>
     </View>
   );
 };

@@ -17,6 +17,12 @@ const deletePost = (postId: any) => {
   }
 };
 
+// Format date
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toDateString().substr(4, 12);
+};
+
 const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
   const { post } = route.params;
   const { _id, createdAt, siteId, siteName, weatherTemp, weatherDesc, notes, publicURL, profile } = post;
@@ -36,7 +42,7 @@ const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
   return (
     <View style={styles.container}>
       <Text style={styles.siteName}>{siteName}</Text>
-      <Text style={styles.date}>{createdAt.replace("\n", ", ")}</Text>
+      <Text style={styles.date}>{formatDate(createdAt)}</Text>
       <WeatherWidget temp={weatherTemp} condition={weatherDesc} />
       <View style={styles.contentContainer}>
         <Text>content goes here</Text>

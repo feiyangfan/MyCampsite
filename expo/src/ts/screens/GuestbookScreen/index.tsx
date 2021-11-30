@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, StyleSheet, Image, FlatList, Alert } from "react-native";
 import { Icon } from "react-native-elements";
 import * as Types from "../../types";
-import { fetch } from "../../lib/api";
+// import { fetch } from "../../lib/api";
 
 const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
+const postURL = "http://mycampsite-team12-d3.herokuapp.com/post";
 
 const isAdmin = true; // Temporary
 
@@ -15,7 +16,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
   const [posts, setPosts] = useState<any[]>([
     {
       _id: 0,
-      createdAt: "Sep 30\n2021",
+      createdAt: "2021-01-01T02:57:27.655Z",
       siteId: 1,
       siteName: "Test Site",
       weatherTemp: 20,
@@ -27,17 +28,17 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
   // Get posts for this site
   useEffect(() => {
     try {
-      fetch(`/post/${locationId}`)
+      fetch(`${postURL}/${locationId}`)
         .then((res) => res.json())
         .then((data) => {
           setPosts([...posts, ...data]);
-          console.log("These are the posts:", posts);
         });
     } catch (err) {
-      console.log("It failed", err);
+      console.log(err);
     }
   }, []);
 
+  // Prompt to confirm before deleting
   const showConfirmDialog = () => {
     return Alert.alert("Delete site", "Are you sure you want to delete this site?", [
       {
@@ -51,6 +52,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
     ]);
   };
 
+  // Delete this site
   const deleteSite = (parkId: any, locationId: any) => {
     try {
       fetch(`${locationURL}/${parkId}/site/${locationId}`, {
@@ -59,6 +61,12 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
     } catch (err) {
       alert("Failed to delete site");
     }
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toDateString().substr(4, 12);
   };
 
   return (
@@ -84,7 +92,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
             renderItem={({ item }) => (
               <View>
                 <TouchableOpacity style={styles.postThumbnail} onPress={() => navigation.navigate("Post", { post: item })}>
-                  <Text style={styles.btnText}>{item.createdAt}</Text>
+                  <Text style={styles.btnText}>{formatDate(item.createdAt)}</Text>
                 </TouchableOpacity>
               </View>
             )}
