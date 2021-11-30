@@ -88,7 +88,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
             color="#fff"
             size={40}
             style={{ paddingRight: 10 }}
-            onPress={() => navigation.navigate("NewEntry", { parkId: parkId, locationId: locationId })}
+            onPress={() => navigation.navigate("NewEntry", { parkId: parkId, locationId: locationId, locationName: locationName, source: "" })}
           />
           <Text style={styles.text}>Add an Entry</Text>
         </View>

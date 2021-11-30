@@ -9,8 +9,7 @@ export type RootStackParamList = {
   Guestbook: {
     parkId: any;
     locationId: any;
-    locationName: String;
-    posts: any;
+    locationName: string;
   };
   Post: {
     post: any;
@@ -21,8 +20,8 @@ export type RootStackParamList = {
   };
   Me: undefined;
   Record: undefined;
-  AddPost: undefined;
-  NewEntry: { parkId: any; locationId: any };
+  AddPost: { source: string };
+  NewEntry: { parkId: any; locationId: any; locationName: string; source: string };
 };
 
 type HomeScreenNavigationProp = NativeStackScreenProps<RootStackParamList, "Home">;
@@ -32,6 +31,7 @@ type PostScreenNavigationProp = NativeStackScreenProps<RootStackParamList, "Post
 type AddSiteScreenNavigationProp = NativeStackScreenProps<RootStackParamList, "AddSite">;
 type RecordScreenNavigationProp = NativeStackScreenProps<RootStackParamList, "Record">;
 type AddPostScreenNavigationProp = NativeStackScreenProps<RootStackParamList, "AddPost">;
+type NewEntryScreenNavigationProp = NativeStackScreenProps<RootStackParamList, "NewEntry">;
 
 export {
   HomeScreenNavigationProp,
@@ -41,4 +41,5 @@ export {
   AddSiteScreenNavigationProp,
   RecordScreenNavigationProp,
   AddPostScreenNavigationProp,
+  NewEntryScreenNavigationProp,
 };

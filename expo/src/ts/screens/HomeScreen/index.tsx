@@ -106,12 +106,11 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
   // Navigate to the guestbook screen for the specified location
   // TODO: Change this function when database is connected
-  const onGuestbookSelect = (parkId: any, locationId: any, locationName: String) => {
+  const onGuestbookSelect = (parkId: any, locationId: any, locationName: string) => {
     navigation.navigate("Guestbook", {
       parkId: parkId,
       locationId: locationId,
       locationName: locationName,
-      posts: [], //Update this to read posts from database
     });
   };
 
