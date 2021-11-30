@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {View, StyleSheet, Dimensions} from 'react-native';
 import MapView, {Camera, PROVIDER_GOOGLE}  from 'react-native-maps';
-import {Text, Button, Overlay} from "react-native-elements";
+import {Text} from "react-native-elements";
 import * as Location from 'expo-location';
 import * as Types from '../../types';
 import MapCampsiteMarker from '../../components/MapCampsiteMarker';
@@ -10,7 +10,6 @@ import {ExpoWebGLRenderingContext, GLView} from 'expo-gl';
 import ExpoTHREE, {THREE} from 'expo-three';
 import {fetch} from '../../lib/api';
 import * as geolib from 'geolib';
-// import {Magnetometer} from 'expo-sensors';
 
 const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   const { ignoreDeviceLocation } = route.params;
@@ -128,45 +127,11 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
     return inRange;
   };
 
-  // magnometer
-  // const [subscription, setSubscription] = useState<any>(null);
-  // const _subscribe = () => {
-  //     setSubscription(
-  //       Magnetometer.addListener(data => {
-  //         let x = data.x;
-  //         let y = data.y;
-  //         let theta = Math.atan2(y, x);
-  //         if (theta > 2 * Math.PI) {
-  //           theta -= 2 * Math.PI;
-  //         }
-  //         if (theta < 0) {
-  //           theta += 2 * Math.PI;
-  //         }
-  //         appState.current.user.heading = theta;
-  //       })
-  //     );
-  //     _setInterval();
-  // };
-
-  // const _setInterval = () => {
-  //   Magnetometer.setUpdateInterval(77);
-  // };
-  
-  // const _unsubscribe = () => {
-  //   subscription && subscription.remove();
-  //   setSubscription(null);
-  // };
-
-  // useEffect(() => {
-  //   _subscribe();
-  //   return () => _unsubscribe();
-  // }, []);
-
-  const moveToGuestbook = (siteId: any, siteName: string) => {
+  const moveToGuestbook = (parkId: any, siteId: any, siteName: string) => {
     navigation.navigate('Guestbook', { 
+      parkId: parkId,
       locationId: siteId,
       locationName: siteName,
-      posts: []
     });
   }
 
@@ -230,52 +195,8 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
     }
   }
 
-  // const AlertOverlay = (props: any) => {
-  //   const [visible, setVisible] = useState<boolean>(props.mode !== 'demo' ? props.liveFirstLoad : true);
-  //   const toggleOverlay = () => {
-  //     setVisible(prev => {
-  //       if (props.mode !== 'demo') {
-  //         if (liveFirstLoad) {
-  //           setLiveFirstLoad(false);
-  //         }
-  //         if (prev) {
-  //           trackLocationOn();
-  //         } else {
-  //           trackLocationOff();
-  //         }
-  //       }
-  //       return !prev;
-  //     });
-  //   };
-  //   return (
-  //     <View style={{position: 'absolute', top: 100, left: 0, zIndex: 2}}>
-  //       <Button buttonStyle={{backgroundColor: '#00AB67'}} title={`Map Mode: ${props.mode === 'demo' ? 'Demo' : 'Live'} Mode`} onPress={toggleOverlay} />
-  //       <Overlay overlayStyle={{borderRadius: 10, borderWidth: 2, borderColor: 'green', padding: 20, backgroundColor: '#00AB67'}} isVisible={visible} onBackdropPress={toggleOverlay}>
-  //         <Text h3 h3Style={{color: 'white', textAlign: 'center'}}>You are in Deliverable 2</Text>
-  //         <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 30 }}>{props.mode === 'demo' ? 'Demo' : 'Live'} Mode</Text>
-  //         { props.mode === 'demo' ? 
-  //           <View>
-  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 16, fontWeight: 'bold'  }}>In demo mode, your location is fixed at Arrowhead Provincial Park.</Text>
-  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may click on the Entrance Site to view its Guestbook.</Text>
-  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 20, fontSize: 14, fontWeight: 'bold'  }}>• You may rotate or tilt the map to view your surroundings.</Text>
-  //           </View>
-  //         : 
-  //           <View>
-  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 16, fontWeight: 'bold' }}>In live mode, your location is tracked from your device.</Text>
-  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may visit Arrowhead Provincinal Park to view the Guestbooks.</Text>
-  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 10, fontSize: 14, fontWeight: 'bold'  }}>• You may rotate or tilt the map to view your surroundings.</Text>
-  //             <Text h4 h4Style={{color: 'white', textAlign: 'center', marginBottom: 20, fontSize: 14, fontWeight: 'bold'  }}>• You may walk around to move your robot character.</Text>
-  //           </View>
-  //         }
-  //         <Button titleStyle={{color: "green"}} buttonStyle={{backgroundColor: 'white', marginBottom: 20}} title={`Click here to go to ${props.mode !== 'demo' ? 'Demo' : 'Live'} Mode`} onPress={props.changeMode} />
-  //         <Button titleStyle={{color: "green"}} buttonStyle={{backgroundColor: 'white'}} title="Return to Map" onPress={toggleOverlay}></Button>
-  //       </Overlay>
-  //     </View>
-  //   );
-  // };
   return (
     <View style={styles.container} pointerEvents={loading ? 'none' : 'auto'}>
-      {/* { mapLoaded ? <AlertOverlay mode={mode} changeMode={changeMode} liveFirstLoad={liveFirstLoad} /> : null } */}
       { mapLoaded ?  <View style={{position: 'absolute', top: 100, left: 0, zIndex: 2, width: '100%', alignItems: 'center'}}>
         <View>
           <View style={{backgroundColor: '#00AB67', padding: 10}}>
@@ -386,7 +307,7 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
         minZoomLevel={15}
         maxZoomLevel={19}
       >
-        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} moveToGuestbook={moveToGuestbook} siteInRange={() => siteInRange(site)} setTooFarAway={setTooFarAway}/>)}
+        {park?.sites?.map((site: any) => <MapCampsiteMarker key={site.name} site={site} moveToGuestbook={(siteId: any, siteName: string) => moveToGuestbook(park._id, siteId, siteName)} siteInRange={() => siteInRange(site)} setTooFarAway={setTooFarAway}/>)}
       </MapView>
     </View>
   )
