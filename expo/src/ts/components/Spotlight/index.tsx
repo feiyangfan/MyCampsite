@@ -21,7 +21,7 @@ const Spotlight = (props: any) => {
   } else {
     return (
       <View>
-        <ScrollView contentContainerStyle={{ marginTop: 15 }} horizontal={true}>
+        <ScrollView contentContainerStyle={{ marginTop: 15 }} horizontal={true} showsHorizontalScrollIndicator={false}>
           {filteredSites.map((site: any) => {
             return (
               <SpotlightCard

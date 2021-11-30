@@ -115,45 +115,45 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       posts: [], //Update this to read posts from database
     });
   };
-  // const image = { uri: "https://reactjs.org/logo-og.png" }; // for testing only
-  // const sites = [
-  // // for testing
-  // {
-  //   _id: "1",
-  //   name: "Stubb's Falls",
-  //   location: "1, 1",
-  //   spotlight: true,
-  //   image: image,
-  // },
-  // {
-  //   _id: "2",
-  //   name: "site 2",
-  //   location: "2, 2",
-  //   spotlight: false,
-  //   image: image,
-  // },
-  // {
-  //   _id: "3",
-  //   name: "Big Bend Lookout",
-  //   location: "3, 3",
-  //   spotlight: true,
-  //   image: image,
-  // },
-  // {
-  //   _id: "4",
-  //   name: "site 4",
-  //   location: "4, 4",
-  //   spotlight: false,
-  //   image: image,
-  // },
-  // {
-  //   _id: "5",
-  //   name: "Arrowhead Skating Trail",
-  //   location: "5, 5",
-  //   spotlight: true,
-  // },
-  // ];
-  const sites = []
+  // for testing
+  const image = { uri: "https://reactjs.org/logo-og.png" }; 
+  const sites = [
+  {
+    _id: "1",
+    name: "Stubb's Falls",
+    location: "1, 1",
+    spotlight: true,
+    image: image,
+  },
+  {
+    _id: "2",
+    name: "site 2",
+    location: "2, 2",
+    spotlight: false,
+    image: image,
+  },
+  {
+    _id: "3",
+    name: "Big Bend Lookout",
+    location: "3, 3",
+    spotlight: true,
+    image: image,
+  },
+  {
+    _id: "4",
+    name: "site 4",
+    location: "4, 4",
+    spotlight: false,
+    image: image,
+  },
+  {
+    _id: "5",
+    name: "Arrowhead Skating Trail",
+    location: "5, 5",
+    spotlight: true,
+  },
+  ];
+  // const sites = []
 
   return (
     <View style={styles.container}>
