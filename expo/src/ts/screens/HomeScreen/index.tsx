@@ -107,12 +107,11 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
   // Navigate to the guestbook screen for the specified location
   // TODO: Change this function when database is connected
-  const onGuestbookSelect = (parkId: any, locationId: any, locationName: String) => {
+  const onGuestbookSelect = (parkId: any, locationId: any, locationName: string) => {
     navigation.navigate("Guestbook", {
       parkId: parkId,
       locationId: locationId,
       locationName: locationName,
-      posts: [], //Update this to read posts from database
     });
   };
   // for testing
@@ -175,7 +174,6 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
                 })
               }
             />
-            <Button buttonStyle={styles.button} title="Add New Post" onPress={() => navigation.navigate("Record")} />
             <Button buttonStyle={styles.button} title="My Account" onPress={() => navigation.navigate("Me")} />
           </View>
         </View>

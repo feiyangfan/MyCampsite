@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, StyleSheet, Image, FlatList, Alert } from "react-native";
 import { Icon } from "react-native-elements";
 import * as Types from "../../types";
+import { fetch } from "../../lib/api";
+
 const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
 
 const isAdmin = true; // Temporary
@@ -9,49 +11,32 @@ const isAdmin = true; // Temporary
 const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationProp) => {
   const { parkId, locationId, locationName } = route.params;
 
-  // dummy posts for testing UI
-  const posts = [
+  // One dummy post for testing:
+  const [posts, setPosts] = useState<any[]>([
     {
-      postId: 0,
-      date: "Sep 30\n2021",
-      locationId: 1,
-      locationName: "Test Site",
-      weather: { temp: 20, condition: "Clear" },
+      _id: 0,
+      createdAt: "Sep 30\n2021",
+      siteId: 1,
+      siteName: "Test Site",
+      weatherTemp: 20,
+      weatherDesc: "Clear",
       notes: "Here's my post!",
-      url: null,
-      userId: 1,
     },
-    {
-      postId: 1,
-      date: "Nov 20\n2021",
-      locationId: 1,
-      locationName: "Test Site",
-      weather: { temp: 20, condition: "Rainy" },
-      notes: "Here's another post!",
-      url: null,
-      userId: 1,
-    },
-    {
-      postId: 3,
-      date: "Nov 20\n2021",
-      locationId: 1,
-      locationName: "Test Site",
-      weather: { temp: 20, condition: "Rainy" },
-      notes: "Here's another post!",
-      url: null,
-      userId: 1,
-    },
-    {
-      postId: 4,
-      date: "Nov 20\n2021",
-      locationId: 1,
-      locationName: "Test Site",
-      weather: { temp: 20, condition: "Rainy" },
-      notes: "Here's another post!",
-      url: null,
-      userId: 1,
-    },
-  ];
+  ]);
+
+  // Get posts for this site
+  useEffect(() => {
+    try {
+      fetch(`/post/${locationId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setPosts([...posts, ...data]);
+          console.log("These are the posts:", posts);
+        });
+    } catch (err) {
+      console.log("It failed", err);
+    }
+  }, []);
 
   const showConfirmDialog = () => {
     return Alert.alert("Delete site", "Are you sure you want to delete this site?", [
@@ -83,17 +68,23 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
         <Text style={styles.text}>{locationName} Guestbook</Text>
 
         <View style={styles.addPost}>
-          <Icon name="add-circle" color="#fff" size={40} style={{ paddingRight: 10 }} onPress={() => navigation.navigate("Record")} />
+          <Icon
+            name="add-circle"
+            color="#fff"
+            size={40}
+            style={{ paddingRight: 10 }}
+            onPress={() => navigation.navigate("NewEntry", { parkId: parkId, locationId: locationId, locationName: locationName, source: "" })}
+          />
           <Text style={styles.text}>Add an Entry</Text>
         </View>
         <View style={styles.listContainer}>
           <FlatList
             data={posts}
-            keyExtractor={(item) => item.postId.toString()}
+            keyExtractor={(item) => item._id.toString()}
             renderItem={({ item }) => (
               <View>
                 <TouchableOpacity style={styles.postThumbnail} onPress={() => navigation.navigate("Post", { post: item })}>
-                  <Text style={styles.btnText}>{item.date}</Text>
+                  <Text style={styles.btnText}>{item.createdAt}</Text>
                 </TouchableOpacity>
               </View>
             )}

@@ -19,14 +19,14 @@ const deletePost = (postId: any) => {
 
 const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
   const { post } = route.params;
-  const { postId, date, locationId, locationName, weather, notes, url, userId } = post;
+  const { _id, createdAt, siteId, siteName, weatherTemp, weatherDesc, notes, publicURL, profile } = post;
 
   const showConfirmDialog = () => {
     return Alert.alert("Delete post", "Are you sure you want to delete this post?", [
       {
         text: "Yes",
         onPress: () => {
-          deletePost(postId);
+          deletePost(_id);
         },
       },
       { text: "No" },
@@ -35,9 +35,9 @@ const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.siteName}>{locationName}</Text>
-      <Text style={styles.date}>{date.replace("\n", ", ")}</Text>
-      <WeatherWidget temp={weather.temp} condition={weather.condition} />
+      <Text style={styles.siteName}>{siteName}</Text>
+      <Text style={styles.date}>{createdAt.replace("\n", ", ")}</Text>
+      <WeatherWidget temp={weatherTemp} condition={weatherDesc} />
       <View style={styles.contentContainer}>
         <Text>content goes here</Text>
       </View>
