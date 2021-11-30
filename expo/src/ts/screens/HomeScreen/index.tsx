@@ -116,41 +116,39 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
     });
   };
   // for testing
-  const image = { uri: "https://reactjs.org/logo-og.png" }; 
   const sites = [
   {
     _id: "1",
     name: "Stubb's Falls",
     location: "1, 1",
     spotlight: true,
-    image: image,
+    image: "https://www.linkpicture.com/q/1_1485.jpg",
   },
   {
     _id: "2",
     name: "site 2",
     location: "2, 2",
-    spotlight: false,
-    image: image,
+    spotlight: false
   },
   {
     _id: "3",
     name: "Big Bend Lookout",
     location: "3, 3",
     spotlight: true,
-    image: image,
+    image: "https://www.linkpicture.com/q/bigbend.jpg",
   },
   {
     _id: "4",
     name: "site 4",
     location: "4, 4",
-    spotlight: false,
-    image: image,
+    spotlight: false
   },
   {
     _id: "5",
     name: "Arrowhead Skating Trail",
     location: "5, 5",
     spotlight: true,
+    image: "https://www.linkpicture.com/q/arrow_1.jpg"
   },
   ];
   // const sites = []

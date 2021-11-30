@@ -4,7 +4,6 @@ import SpotlightCard from "../SpotlightCard";
 
 const Spotlight = (props: any) => {
   const { parkId, sites } = props;
-  
   // filter out non spotlight sites
   const filteredSites = sites.filter((site: any) => {
     return site.spotlight === true;

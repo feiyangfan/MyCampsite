@@ -9,7 +9,7 @@ import {
 
 const SpotlightCard = (props: any) => {
   const { parkId, siteId, siteName, siteImage } = props;
-  //console.log(siteId, siteName, siteImage);
+  console.log(siteId, siteName, siteImage);
   if (siteImage) {
     return (
       <View>
@@ -18,7 +18,7 @@ const SpotlightCard = (props: any) => {
           onPress={() => props.onSpotlightSelect(parkId, siteId, siteName)}
         >
           <ImageBackground
-            source={siteImage}
+            source={{uri: siteImage}}
             resizeMode="cover"
             style={styles.image}
             imageStyle={{ borderRadius: 25 }}
