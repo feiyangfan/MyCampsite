@@ -4,16 +4,20 @@ import { Camera } from 'expo-camera'
 import { CameraType, WhiteBalance } from 'expo-camera/build/Camera.types';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
+import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker'
 import * as Types from "../../types";
 
 const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) => {
   const [cameraPermission, setCameraPermission] = useState(false);
   const [audioPermission, setAudioPermission] = useState(false);
+  const [cameraRollPermission, setCameraRollPermission] = useState(false);
 
   const [cameraReference, setCameraRef] = useState<any | null>(null);
 
-  /* console.log(cameraReference); */ 
+  /* console.log(cameraReference); */
 
   const [cameraType, setcameraType] = useState(Camera.Constants.Type.back);
   const [cameraFlash, setCameraFlash] = useState(Camera.Constants.FlashMode.off);
@@ -36,6 +40,12 @@ const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) =
       setAudioPermission(status === 'granted');
     })();
   }, []);
+  useEffect(() => {
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      setCameraRollPermission(status === 'granted');
+    })();
+  }, []);
 
   if (!cameraPermission || !audioPermission) {
     return (
@@ -51,8 +61,8 @@ const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) =
         if (recording) {
           const data = await recording;
           const source = data.uri;
-          {/* Ignore this error. Typescript just odd*/}
-          navigation.navigate("AddPost", {source: source});
+          {/* Ignore this error. Typescript just odd*/ }
+          navigation.navigate("AddPost", { source: source });
         }
       } catch (error) {
         console.warn(error)
@@ -63,6 +73,18 @@ const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) =
     if (cameraReference) {
       cameraReference.stopRecording()
     }
+  }
+
+  const chooseFromCameraRoll = async () => {
+    let attempt = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      aspect: [16, 9],
+      quality: 1,
+    })
+    if (!attempt.cancelled) {
+      navigation.navigate("AddPost", { source: attempt.uri });
+    }
+
   }
 
   return (
@@ -80,8 +102,11 @@ const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) =
 
       <View style={styles.btmContainer}>
         <View style={{ flex: 1 }}>
+          <TouchableOpacity style={styles.gallery} onPress={() => chooseFromCameraRoll()}>
+            <MaterialIcons name="add-photo-alternate" size={35} color="white" />
+            <Text style={styles.flashText}>Gallery</Text>
+          </TouchableOpacity>
         </View>
-
         <View style={styles.recordButtonCont}>
           <TouchableOpacity
             style={styles.recordButton}
@@ -92,7 +117,7 @@ const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) =
         </View>
 
         <View style={{ flex: 1 }}>
-          <TouchableOpacity style={styles.flip} onPress = {() => setcameraType(cameraType === Camera.Constants.Type.front ? Camera.Constants.Type.back : Camera.Constants.Type.front)}>
+          <TouchableOpacity style={styles.flip} onPress={() => setcameraType(cameraType === Camera.Constants.Type.front ? Camera.Constants.Type.back : Camera.Constants.Type.front)}>
             <Ionicons name="md-camera-reverse-outline" size={35} color="white" />
             <Text style={styles.flashText}>Flip</Text>
           </TouchableOpacity>
@@ -112,7 +137,7 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
     alignItems: 'center',
-    justifyContent:'flex-end',
+    justifyContent: 'flex-end',
   },
   btmContainer: {
     alignItems: 'center',
@@ -139,7 +164,16 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     width: 50,
     height: 60,
-    marginBottom: 45, 
+    marginBottom: 45,
+    alignItems: 'center'
+  },
+  gallery: {
+    borderColor: 'grey',
+    overflow: 'hidden',
+    width: 50,
+    height: 60,
+    marginBottom: 45,
+    marginLeft: 60,
     alignItems: 'center'
   },
   flashText: {

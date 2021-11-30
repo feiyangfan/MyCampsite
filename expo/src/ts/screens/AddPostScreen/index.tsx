@@ -26,6 +26,8 @@ export default function AddPost(props) {
     };
     generateThumbnail()
 
+    console.log(props.route.params.source)
+
     return (
         <View style={styles.container}>
             <View style={styles.descriptionContainer}>
