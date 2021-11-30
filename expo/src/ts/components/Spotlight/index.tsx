@@ -3,48 +3,10 @@ import { ScrollView, View, Text, StyleSheet } from "react-native";
 import SpotlightCard from "../SpotlightCard";
 
 const Spotlight = (props: any) => {
-  //const { sites } = props;
-  const image = { uri: "https://reactjs.org/logo-og.png" }; // for testing only
-  const sites = [
-    // for testing
-    {
-      _id: "1",
-      name: "Stubb's Falls",
-      location: "1, 1",
-      spotlight: true,
-      image: image,
-    },
-    {
-      _id: "2",
-      name: "site 2",
-      location: "2, 2",
-      spotlight: false,
-      image: image,
-    },
-    {
-      _id: "3",
-      name: "Big Bend Lookout",
-      location: "3, 3",
-      spotlight: true,
-      image: image,
-    },
-    {
-      _id: "4",
-      name: "site 4",
-      location: "4, 4",
-      spotlight: false,
-      image: image,
-    },
-    {
-      _id: "5",
-      name: "Arrowhead Skating Trail",
-      location: "5, 5",
-      spotlight: true,
-    },
-  ];
-
+  const { parkId, sites } = props;
+  
   // filter out non spotlight sites
-  const filteredSites = sites.filter((site) => {
+  const filteredSites = sites.filter((site: any) => {
     return site.spotlight === true;
   });
   
@@ -65,6 +27,7 @@ const Spotlight = (props: any) => {
               <SpotlightCard
                 key={site._id}
                 onSpotlightSelect={props.onSpotlightSelect}
+                parkId={parkId}
                 siteId={site._id}
                 siteName={site.name}
                 siteImage={site.image}
@@ -84,6 +47,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginLeft: 20,
     marginTop: 40,
+    marginBottom: 40,
     textAlign: "center",
     color: "white",
   },

@@ -15,7 +15,7 @@ const SpotlightCard = (props: any) => {
       <View>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => props.onSpotlightSelect(siteId, siteName)}
+          onPress={() => props.onSpotlightSelect(parkId, siteId, siteName)}
         >
           <ImageBackground
             source={siteImage}
