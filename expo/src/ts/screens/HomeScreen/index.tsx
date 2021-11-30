@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { Text, View, ScrollView, StyleSheet, Image } from "react-native";
 import { Button } from "react-native-elements";
 import * as Location from "expo-location";
 import * as geolib from "geolib";
@@ -13,7 +13,7 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   const [nearbySites, setNearbySites] = useState<any[]>([]);
   const [allSites, setAllSites] = useState<any[]>([]);
   const [userLocation, setUserLocation] = useState<number[]>([]);
-  const [nearestParkId, setNearestParkId] = useState();
+  const [nearestParkId, setNearestParkId] = useState("");
   const [subscription, setSubscription] = useState<any>();
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -75,15 +75,19 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
     });
 
     // Store nearest park
-    try {
+    if (parkArray.length === 0) {
+      setNearestParkId("61a04d58dedb185a1ab51ebe"); //Current ID of "None" park - may need to update
+    } else {
       setNearestParkId(parkArray[0]._id);
-    } catch (err) {}
+    }
 
     // Store sites from current list of parks (in case there is more than one):
     const sites: any[] = [];
     parkArray.map((park) => sites.push(...park.sites));
     setAllSites(sites);
   };
+
+  const updateSiteList = (parkId: any) => {};
 
   // Return true if the user is in range of a given site, false otherwise.
   const siteInRange = (site: any) => {
@@ -103,8 +107,9 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
   // Navigate to the guestbook screen for the specified location
   // TODO: Change this function when database is connected
-  const onGuestbookSelect = (locationId: any, locationName: String) => {
+  const onGuestbookSelect = (parkId: any, locationId: any, locationName: String) => {
     navigation.navigate("Guestbook", {
+      parkId: parkId,
       locationId: locationId,
       locationName: locationName,
       posts: [], //Update this to read posts from database
@@ -113,45 +118,31 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../../../../assets/images/lake.png")} style={{ width: "100%", height: 200 }} />
-      <View style={styles.mainCard}>
-        <Text style={styles.text}>Guestbooks near you:</Text>
-        <GuestbookList locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
-        <Text style={styles.text}>Spotlight:</Text>
-        <Spotlight sites={allSites} onSpotlightSelect={onGuestbookSelect} />
-        <View style={styles.loginWrapper}>
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="View Map (Demo)"
-            onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })}
-          />
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="View Map (Live)"
-            onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })}
-          />
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="Add New Site"
-            onPress={() =>
-              navigation.navigate("AddSite", {
-                location: userLocation,
-                parkId: nearestParkId,
-              })
-            }
-          />
-          <Button
-            style={styles.loginBtn}
-            buttonStyle={{ backgroundColor: "#00AB67" }}
-            title="Add New Post"
-            onPress={() => navigation.navigate("Record")}
-          />
-          <Button style={styles.loginBtn} buttonStyle={{ backgroundColor: "#00AB67" }} title="My Account" onPress={() => navigation.navigate("Me")} />
+      <Image source={require("../../../../assets/images/lake.png")} style={styles.image} />
+      <ScrollView style={{ backgroundColor: "transparent", height: "100%" }} nestedScrollEnabled={true}>
+        <View style={styles.mainCard}>
+          <Text style={styles.text}>Guestbooks near you:</Text>
+          <GuestbookList parkId={nearestParkId} locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
+          <Text style={styles.text}>Spotlight:</Text>
+          <Spotlight parkId={nearestParkId} sites={allSites} onSpotlightSelect={()=>onGuestbookSelect} />
+          <View style={styles.buttonWrapper}>
+            <Button buttonStyle={styles.button} title="View Map (Demo)" onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })} />
+            <Button buttonStyle={styles.button} title="View Map (Live)" onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })} />
+            <Button
+              buttonStyle={styles.button}
+              title="Add New Site"
+              onPress={() =>
+                navigation.navigate("AddSite", {
+                  location: userLocation,
+                  parkId: nearestParkId,
+                })
+              }
+            />
+            <Button buttonStyle={styles.button} title="Add New Post" onPress={() => navigation.navigate("Record")} />
+            <Button buttonStyle={styles.button} title="My Account" onPress={() => navigation.navigate("Me")} />
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -163,6 +154,11 @@ const styles = StyleSheet.create({
     height: "100%",
     flexDirection: "column",
     justifyContent: "flex-start",
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    position: "absolute",
   },
   text: {
     fontSize: 25,
@@ -176,19 +172,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#005131",
     color: "white",
     flexDirection: "column",
-    height: 600,
+    flex: 1,
     position: "relative",
-    top: -20,
+    top: 170,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 10,
+    height: 1000,
   },
-  loginWrapper: {
+  buttonWrapper: {
     alignItems: "center",
   },
-  loginBtn: {
-    marginTop: 15,
+  button: {
+    margin: 15,
     width: 200,
+    backgroundColor: "#00AB67",
   },
 });
 

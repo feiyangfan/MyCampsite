@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import GuestbookCard from '../GuestbookCard';
+import React from "react";
+import { View, Text, StyleSheet, FlatList } from "react-native";
+import GuestbookCard from "../GuestbookCard";
 
 const GuestbookList = (props: any) => {
-  const { locations } = props;
+  const { locations, parkId } = props;
 
   if (locations.length == 0) {
     return (
@@ -14,11 +14,21 @@ const GuestbookList = (props: any) => {
   } else {
     return (
       <View style={styles.guestbookList}>
-        {locations.map((location: any) => {
-          return (
-            <GuestbookCard key={location._id} onGuestbookSelect={props.onGuestbookSelect} locationName={location.name} locationId={location._id} />
-          );
-        })}
+        <FlatList
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          data={locations}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={({ item }) => (
+            <GuestbookCard
+              key={item._id}
+              onGuestbookSelect={props.onGuestbookSelect}
+              parkId={parkId}
+              locationName={item.name}
+              locationId={item._id}
+            />
+          )}
+        />
       </View>
     );
   }
@@ -31,12 +41,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginLeft: 20,
     marginTop: 40,
-    textAlign: 'left',
-    color: 'white',
+    textAlign: "left",
+    color: "white",
   },
   guestbookList: {
     height: 150,
-    alignItems: 'center',
-    flexDirection: 'row',
+    alignItems: "center",
+    flexDirection: "row",
   },
 });

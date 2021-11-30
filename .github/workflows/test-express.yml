@@ -8,6 +8,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      GCP_SERVICE_ACCOUNT_KEY_ASC: ${{secrets.GCP_SERVICE_ACCOUNT_KEY_ASC}}
     defaults:
       run:
         working-directory: express

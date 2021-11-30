@@ -3,6 +3,8 @@ import { Text, View, StyleSheet, TextInput } from "react-native";
 import { Button, ButtonGroup } from "react-native-elements";
 import * as Types from "../../types";
 
+const isAdmin = true; // For testing, give admin capability to all users. Must update later
+
 const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp) => {
   const { location, parkId } = route.params;
   const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
@@ -11,13 +13,11 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
   const [radius, setRadius] = useState("");
   const [type, setType] = useState("Campsite");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const isAdmin = true; // For testing, give admin capability to all users. Must update later
 
   const buttons = ["Campsite", "Point of Interest"];
 
   // Get park name to suggest
   useEffect(() => {
-    console.log(locationURL);
     fetch(`${locationURL}/${parkId}`)
       .then((data) => data.json())
       .then((park) => {
@@ -59,7 +59,7 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
       setRadius("");
       alert("Site added!");
     } catch (err) {
-      console.log("Add site failed");
+      alert("Add site failed");
     }
   };
   return (
@@ -74,23 +74,28 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
         <TextInput style={styles.input} placeholder={"Site name"} value={name} onChangeText={(name) => setName(name)} />
       </View>
 
-      <View style={styles.fieldContainer}>
-        <Text style={styles.text}> Site type: </Text>
-        <View style={styles.buttonsContainer}>
-          <ButtonGroup
-            onPress={handleSelectType.bind(this)}
-            selectedIndex={selectedIndex}
-            buttons={buttons}
-            containerStyle={{ height: "100%", width: "100%", marginTop: 20 }}
-            buttonContainerStyle={{ backgroundColor: "#00301D" }}
-            selectedButtonStyle={{ backgroundColor: "#00AB67" }}
-          />
+      {isAdmin && (
+        <View style={{ width: "100%" }}>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.text}> Site type: </Text>
+            <View style={styles.buttonsContainer}>
+              <ButtonGroup
+                onPress={handleSelectType.bind(this)}
+                selectedIndex={selectedIndex}
+                buttons={buttons}
+                containerStyle={{ height: "100%", width: "100%", marginLeft: 0 }}
+                buttonContainerStyle={{ backgroundColor: "#00301D" }}
+                selectedButtonStyle={{ backgroundColor: "#00AB67" }}
+              />
+            </View>
+          </View>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.text}> Access radius: </Text>
+            <TextInput style={styles.input} placeholder={"Range (metres)"} value={radius} onChangeText={(radius) => setRadius(radius)} />
+          </View>
         </View>
-      </View>
-      <View style={styles.fieldContainer}>
-        <Text style={styles.text}> Access radius: </Text>
-        <TextInput style={styles.input} placeholder={"Range (metres)"} value={radius} onChangeText={(radius) => setRadius(radius)} />
-      </View>
+      )}
+
       <Button buttonStyle={styles.addBtn} titleStyle={styles.btnText} title="Add Site" onPress={handleAddSite} />
     </View>
   );
@@ -121,7 +126,7 @@ const styles = StyleSheet.create({
     width: "70%",
     height: 40,
     fontSize: 25,
-    marginLeft: 0,
+    marginTop: 15,
   },
   addBtn: {
     width: 200,

@@ -1,12 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 const GuestbookCard = (props: any) => {
-  const { locationId, locationName } = props;
+  const { parkId, locationId, locationName } = props;
 
   return (
     <View>
-      <TouchableOpacity style={styles.btn} onPress={() => props.onGuestbookSelect(locationId, locationName)}>
+      <TouchableOpacity style={styles.btn} onPress={() => props.onGuestbookSelect(parkId, locationId, locationName)}>
         <Text style={styles.btnText}>{locationName}</Text>
       </TouchableOpacity>
     </View>
@@ -15,19 +15,19 @@ const GuestbookCard = (props: any) => {
 
 const styles = StyleSheet.create({
   btnText: {
-    textAlign: 'center',
-    color: '#005131',
+    textAlign: "center",
+    color: "#005131",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   btn: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderWidth: 1,
     borderRadius: 10,
     padding: 7,
     width: 100,
     height: 100,
-    justifyContent: 'center',
+    justifyContent: "center",
     marginLeft: 10,
   },
 });

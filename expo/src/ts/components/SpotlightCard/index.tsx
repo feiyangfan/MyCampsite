@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 const SpotlightCard = (props: any) => {
-  const { siteId, siteName, siteImage } = props;
+  const { parkId, siteId, siteName, siteImage } = props;
   //console.log(siteId, siteName, siteImage);
   if (siteImage) {
     return (
@@ -33,7 +33,7 @@ const SpotlightCard = (props: any) => {
       <View>
         <TouchableOpacity
           style={[styles.card, { borderRadius: 25, backgroundColor: "white" }]}
-          onPress={() => props.onSpotlightSelect(siteId, siteName)}
+          onPress={() => props.onSpotlightSelect(parkId, siteId, siteName)}
         >
           <Text style={[styles.cardText, { color: "#005131" }]}>
             {siteName}
