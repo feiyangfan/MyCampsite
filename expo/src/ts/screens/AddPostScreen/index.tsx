@@ -4,6 +4,7 @@ import * as VideoThumbnails from 'expo-video-thumbnails';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
+import {uploadAsync} from "expo-file-system"
 import {AddPostScreenNavigationProp} from "../../types"
 import {fetchJSON} from "../../lib/api"
 
@@ -51,10 +52,13 @@ export default function AddPost(props: AddPostScreenNavigationProp) {
             })
             if (!signedURL)
                 throw new Error("Missing signed URL from /post response")
+            const {status: uploadStatus} = await uploadAsync(signedURL, props.route.params.source, {httpMethod: "PUT"})
+            if (uploadStatus < 200 || uploadStatus >= 300)
+                throw new Error("Failed to upload")
             const post = await fetchJSON(`/post/${id}`, "POST", {
                 finish: true
             })
-            console.log(post)
+            console.log(`Finished updating post ${post.id}`)
         }
         catch (error) {
             console.error(error)
