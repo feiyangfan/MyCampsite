@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 export const SiteSchema = mongoose.Schema({
   name: { type: String, required: true },
   location: { type: Object, required: true }, // Can type be SiteLocationSchema?
+  spotlight: {type: Boolean, default: false},
   image: {type: String, required: false}
 });
 
