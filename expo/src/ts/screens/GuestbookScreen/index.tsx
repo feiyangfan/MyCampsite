@@ -77,7 +77,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <View>
-                <TouchableOpacity style={styles.postThumbnail} onPress={() => navigation.navigate("Post", { post: item })}>
+                <TouchableOpacity style={styles.postThumbnail} onPress={() => navigation.navigate("Post", { post: item, parkId })}>
                   <Text style={styles.btnText}>{formatDate(item.createdAt)}</Text>
                 </TouchableOpacity>
               </View>

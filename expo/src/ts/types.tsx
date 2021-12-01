@@ -13,6 +13,7 @@ export type RootStackParamList = {
   };
   Post: {
     post: any;
+    parkId: string;
   };
   AddSite: {
     location: any;

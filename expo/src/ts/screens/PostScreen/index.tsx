@@ -1,8 +1,10 @@
-import React from "react";
+import React, {useState} from "react";
 import { Text, View, StyleSheet, Alert } from "react-native";
 import {Icon, Image} from "react-native-elements";
+import {Video} from "expo-av"
 import * as Types from "../../types";
 import WeatherWidget from "../../components/WeatherWidget";
+import {useSite} from "../../lib/location"
 
 const isAdmin = true; // Temporary
 
@@ -25,7 +27,9 @@ const formatDate = (dateString: string) => {
 
 const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
   const { post } = route.params;
-  const { _id, createdAt, siteId, siteName, weatherTemp, weatherDesc, notes, publicURL, thumbnailPublicURL, profile } = post;
+  const { _id, createdAt, siteId, weatherTemp, weatherDesc, notes, publicURL, thumbnailPublicURL, profile } = post;
+  const [showPlayer, setShowPlayer] = useState(false)
+  const site = useSite(siteId, route.params.parkId)
 
   const showConfirmDialog = () => {
     return Alert.alert("Delete post", "Are you sure you want to delete this post?", [
@@ -41,11 +45,28 @@ const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.siteName}>{siteName}</Text>
+      <Text style={styles.siteName}>{site.state?.name}</Text>
       <Text style={styles.date}>{formatDate(createdAt)}</Text>
       <WeatherWidget temp={weatherTemp} condition={weatherDesc} />
       <View style={styles.contentContainer}>
-        <Image source={{uri: thumbnailPublicURL}} resizeMode="cover" style={styles.thumbnail} />
+        {showPlayer &&
+            <Video
+                style={styles.thumbnail}
+                source={{uri: publicURL}}
+                useNativeControls
+                isLooping
+                shouldPlay
+                resizeMode="contain"
+            />
+        }
+        {!showPlayer &&
+            <Image
+                source={{uri: thumbnailPublicURL}}
+                resizeMode="cover"
+                style={styles.thumbnail}
+                onPress={() => setShowPlayer(true)}
+            />
+        }
       </View>
       <Text style={styles.text}>{notes}</Text>
 
@@ -63,39 +84,37 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#005131",
     color: "white",
-    height: "100%",
     flexDirection: "column",
-    padding: 20,
+    flex: 1,
     alignItems: "center",
   },
   siteName: {
-    fontSize: 50,
+    flex: 1,
+    fontSize: 40,
     color: "white",
     margin: 10,
   },
-
-  date: { fontSize: 30, color: "white", textAlign: "center", margin: 10 },
+  date: { flex: 1, fontSize: 30, color: "white", textAlign: "center", margin: 10 },
   text: {
+    flex: 2,
     fontSize: 20,
     textAlign: "center",
     color: "white",
     margin: 10,
   },
   contentContainer: {
-    margin: 10,
+    flex: 6,
+    width: "100%",
     marginTop: 20,
-    width: 300,
-    height: 300,
     backgroundColor: "white",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "stretch",
+    justifyContent: "space-between",
   },
   thumbnail: {
-    width: 300,
-    height: 300
+    width: "100%",
+    height: "100%"
   },
-  deletePost: { flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 10, marginTop: "auto" },
+  deletePost: { flex: 1, flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 10, marginTop: "auto" },
 });
 
 export default PostScreen;
