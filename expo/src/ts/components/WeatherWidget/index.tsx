@@ -5,19 +5,42 @@ import { Fontisto } from "@expo/vector-icons";
 
 const background_colors: {[key: string]: string} = {
     'Clear': "#0095ff", 
-    'Rainy': "#6b95ff", 
-    'Cloudy': "#868686", 
-    'Snowy': "#FEFEFE", 
-    "Atmosphere": "#2d3436"
+    'Rain': "#6b95ff", 
+    'Clouds': "#868686", 
+    'Snow': "#FEFEFE", 
+    "Thunderstorm": "#6b95ff",
+    "Drizzle": "#6b95ff",
+    "Atmosphere": "#2d3436",
+    // extra atmospheric conditions
+    "Mist": "#2d3436",
+    "Smoke": "#2d3436",
+    "Haze": "#2d3436",
+    "Dust": "#2d3436",
+    "Fog": "#2d3436",
+    "Sand": "#2d3436",
+    "Ash": "#2d3436",
+    "Squall": "#2d3436",
+    "Tornado": "#2d3436"
 }
 
 
 const icons: {[key: string]: keyof typeof Fontisto.glyphMap} = {
     Clear: "day-sunny",
-    Cloudy: "cloudy",
-    Rainy: "rain",
-    Snowy: "snow",
-    Atmosphere: "cloudy-gusts",
+    Rain: "rains",
+    Clouds: "cloudy",
+    Snow: "snow",
+    Thunderstorm: "lightnings",
+    Atmosphere: "cloudy",
+    // extra atmospheric conditions
+    Mist: "rain",
+    Smoke: "fog",
+    Haze: "fog",
+    Dust: "fog",
+    Fog: "fog",
+    Sand: "fog",
+    Ash: "fog",
+    Squall: "fog",
+    Tornado: "wind"
   };
 
 
