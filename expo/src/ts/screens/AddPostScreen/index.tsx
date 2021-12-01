@@ -7,26 +7,41 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 
+// ignore this error, typescript is just odd
 export default function AddPost(props) {
+    // will be used in navigation on page
     const navigation = useNavigation();
+
+    // variable used to keep track of image source
     const [image, setImage] = useState(null);
 
+    // creating thumbnail for video
+    // code was inspired by https://docs.expo.dev/versions/latest/sdk/video-thumbnails
     const generateThumbnail = async () => {
         try {
             const { uri } = await VideoThumbnails.getThumbnailAsync(
+                // THIS RIGHT HERE IS THE FILEPATH TO THE VIDEO
                 props.route.params.source,
                 {
                     time: 2,
                 }
             );
+            // Setting thumbnail path
             setImage(uri);
         } catch (e) {
             console.warn(e);
         }
     };
+    // Calling on it to generate the video thumbnail at the beginning of the video
     generateThumbnail()
 
-    console.log(props.route.params.source)
+    // prints out file path to video on device
+    //console.log(props.route.params.source)
+
+    // TO-DO FUNCTION FOR SAVING POST
+    const handleSavePost = () => {
+
+    }
 
     return (
         <View style={styles.container}>
@@ -40,12 +55,13 @@ export default function AddPost(props) {
             <KeyboardAvoidingView 
             behavior={Platform.OS === "android" ? "height" : "padding"}>
                 <View style={styles.btnsContainer}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}
+                    <TouchableOpacity onPress={() => navigation.navigate("Record")}
                         style={styles.backButton}>
                         <Feather name="x" size={24} color="black" />
                         <Text style={styles.backButtonText}>Cancel</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.goBack()}
+                    {/* handleSavePost is called HERE */}
+                    <TouchableOpacity onPress={handleSavePost}
                         style={styles.postButton}>
                         <Ionicons name="send-outline" size={24} color="white" />
                         <Text style={styles.PostButtonText}>Post</Text>
