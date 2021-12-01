@@ -5,11 +5,11 @@ import * as Types from "../../types";
 import WeatherWidget from "../../components/WeatherWidget";
 
 const isAdmin = true; // Temporary
-const postURL = "";
+
 const deletePost = (postId: any) => {
   try {
     alert("This doesn't work yet!");
-    // fetch(`${postURL}/${postId}`, {
+    // fetch(`/post/${postId}`, {
     //   method: "DELETE",
     // });
   } catch (err) {

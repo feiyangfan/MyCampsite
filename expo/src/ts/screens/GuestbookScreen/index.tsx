@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, StyleSheet, Image, FlatList, Alert } from "react-native";
 import { Icon } from "react-native-elements";
 import * as Types from "../../types";
-// import { fetch } from "../../lib/api";
-
-const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
-const postURL = "http://mycampsite-team12-d3.herokuapp.com/post";
+import { fetch } from "../../lib/api";
 
 const isAdmin = true; // Temporary
 
@@ -28,7 +25,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
   // Get posts for this site
   useEffect(() => {
     try {
-      fetch(`${postURL}/${locationId}`)
+      fetch(`/location/${locationId}`)
         .then((res) => res.json())
         .then((data) => {
           setPosts([...posts, ...data]);
@@ -55,7 +52,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
   // Delete this site
   const deleteSite = (parkId: any, locationId: any) => {
     try {
-      fetch(`${locationURL}/${parkId}/site/${locationId}`, {
+      fetch(`/location/${parkId}/site/${locationId}`, {
         method: "DELETE",
       });
     } catch (err) {
