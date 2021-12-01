@@ -25,7 +25,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
   // Get posts for this site
   useEffect(() => {
     try {
-      fetch(`/location/${locationId}`)
+      fetch(`/post/${locationId}`)
         .then((res) => res.json())
         .then((data) => {
           setPosts([...posts, ...data]);
