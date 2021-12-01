@@ -1,19 +1,21 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
-import * as Types from "../../types";
 import * as VideoThumbnails from 'expo-video-thumbnails';
-import { useNavigation } from '@react-navigation/core';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
+import {AddPostScreenNavigationProp} from "../../types"
+import {fetchJSON} from "../../lib/api"
 
 // ignore this error, typescript is just odd
-export default function AddPost(props) {
+export default function AddPost(props: AddPostScreenNavigationProp) {
     // will be used in navigation on page
-    const navigation = useNavigation();
+    const navigation = props.navigation;
 
     // variable used to keep track of image source
-    const [image, setImage] = useState(null);
+    const [image, setImage] = useState<string>();
+
+    const [description, setDescription] = useState("")
 
     // creating thumbnail for video
     // code was inspired by https://docs.expo.dev/versions/latest/sdk/video-thumbnails
@@ -33,14 +35,24 @@ export default function AddPost(props) {
         }
     };
     // Calling on it to generate the video thumbnail at the beginning of the video
-    generateThumbnail()
+    useEffect(() => {
+        generateThumbnail()
+    }, [])
 
     // prints out file path to video on device
     //console.log(props.route.params.source)
 
     // TO-DO FUNCTION FOR SAVING POST
-    const handleSavePost = () => {
-
+    const handleSavePost = async () => {
+        try {
+            const {id, signedURL} = await fetchJSON("/post", "POST", {
+                siteId: props.route.params.locationId,
+                notes: description
+            })
+        }
+        catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -48,6 +60,8 @@ export default function AddPost(props) {
             <View style={styles.descriptionContainer}>
                 {image && <Image source={{ uri: image }} style={styles.thumbnail} />}
                 <TextInput placeholder="Add Post Description"
+                    value={description}
+                    onChangeText={(text) => setDescription(text)}
                     multiline
                     maxLength={150} style={styles.description} />
             </View>
@@ -55,7 +69,7 @@ export default function AddPost(props) {
             <KeyboardAvoidingView 
             behavior={Platform.OS === "android" ? "height" : "padding"}>
                 <View style={styles.btnsContainer}>
-                    <TouchableOpacity onPress={() => navigation.navigate("Record")}
+                    <TouchableOpacity onPress={() => navigation.navigate("Record", {locationId: props.route.params.locationId})}
                         style={styles.backButton}>
                         <Feather name="x" size={24} color="black" />
                         <Text style={styles.backButtonText}>Cancel</Text>

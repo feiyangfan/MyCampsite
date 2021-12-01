@@ -82,7 +82,7 @@ const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) =
           {/* Ignore this error. Typescript just odd*/ }
           // After the recording is done, we want to send the video path saved on the device locally to
           // the AddPost screen where users can add a description and upload the video
-          navigation.navigate("AddPost", { source: source });
+          navigation.navigate("AddPost", { source: source, locationId: route.params.locationId });
         }
       } catch (error) {
         // Error Handling
@@ -109,7 +109,7 @@ const RecordScreen = ({ route, navigation }: Types.RecordScreenNavigationProp) =
     // If our attempt at chooosing a video is successful, send the video path saved on the device locally to
     // the AddPost screen where users can add a description and upload the video
     if (!attempt.cancelled) {
-      navigation.navigate("AddPost", { source: attempt.uri });
+      navigation.navigate("AddPost", { source: attempt.uri, locationId: route.params.locationId });
     }
 
   }
