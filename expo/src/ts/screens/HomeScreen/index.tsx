@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, ScrollView, StyleSheet, Image } from "react-native";
+import { Text, View, ScrollView, StyleSheet, Image, ActivityIndicator } from "react-native";
 import { Button } from "react-native-elements";
 import * as Location from "expo-location";
 import * as geolib from "geolib";
@@ -16,8 +16,7 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   const [nearestParkId, setNearestParkId] = useState("");
   const [subscription, setSubscription] = useState<any>();
   const [errorMsg, setErrorMsg] = useState("");
-
-  const backgroundImg = "../../../../assets/images/lake.png";
+  const [isLoading, setLoading] = useState(true);
 
   // Get location permissions, watch user's location, and initialize list of sites
   useEffect(() => {
@@ -58,7 +57,8 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
     fetch("/location")
       .then((response) => response.json())
       .then((data) => (parks = data))
-      .then(() => determineCurrentPark(location, parks));
+      .then(() => determineCurrentPark(location, parks))
+      .then(() => setLoading(false));
   };
 
   // Determine which park a user is in, if any, and set the sites to check based on park
@@ -76,7 +76,10 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
     // Store nearest park
     if (parkArray.length === 0) {
-      setNearestParkId("61a04d58dedb185a1ab51ebe"); //Current ID of "None" park - may need to update
+      //Get ID of "Unknown" park
+      fetch("/location/unknown")
+        .then((response) => response.json())
+        .then((data) => setNearestParkId(data._id));
     } else {
       setNearestParkId(parkArray[0]._id);
     }
@@ -158,7 +161,11 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       <ScrollView style={{ backgroundColor: "transparent", height: "100%" }} nestedScrollEnabled={true}>
         <View style={styles.mainCard}>
           <Text style={styles.text}>Guestbooks near you:</Text>
-          <GuestbookList parkId={nearestParkId} locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
+          {isLoading ? (
+            <ActivityIndicator style={styles.loading} />
+          ) : (
+            <GuestbookList parkId={nearestParkId} locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
+          )}
           <Text style={styles.text}>Spotlight:</Text>
           <Spotlight parkId={nearestParkId} sites={sites} onSpotlightSelect={onGuestbookSelect} />
           <View style={styles.buttonWrapper}>
@@ -222,6 +229,9 @@ const styles = StyleSheet.create({
     margin: 15,
     width: 200,
     backgroundColor: "#00AB67",
+  },
+  loading: {
+    marginTop: 20,
   },
 });
 

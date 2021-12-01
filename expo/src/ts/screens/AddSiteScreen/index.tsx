@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, TextInput, ScrollView } from "react-native";
 import { Button, ButtonGroup } from "react-native-elements";
 import * as Types from "../../types";
+import { fetch } from "../../lib/api";
 
 const isAdmin = true; // For testing, give admin capability to all users. Must update later
 
 const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp) => {
   const { location, parkId } = route.params;
-  const locationURL = "http://mycampsite-team12-d3.herokuapp.com/location";
   const [name, setName] = useState("");
   const [park, setPark] = useState("");
   const [radius, setRadius] = useState("");
@@ -18,10 +18,10 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
 
   // Get park name to suggest
   useEffect(() => {
-    fetch(`${locationURL}/${parkId}`)
+    fetch(`/location/${parkId}`)
       .then((data) => data.json())
       .then((park) => {
-        park.name !== null ? setPark(park.name) : setPark("");
+        park !== null ? setPark(park.name) : setPark("");
       })
       .catch((error) => console.log(error));
   }, []);
@@ -37,7 +37,7 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
 
   const handleAddSite = () => {
     try {
-      fetch(`${locationURL}/${parkId}/site/`, {
+      fetch(`/location/${parkId}/site/`, {
         method: "POST",
         headers: {
           Accept: "application/json",

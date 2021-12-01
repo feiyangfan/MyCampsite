@@ -9,6 +9,7 @@ import {
   getSiteById,
   addSite,
   deleteSiteById,
+  getUnknownPark,
 } from "../controllers/location.js";
 
 const router = express.Router();
@@ -40,5 +41,8 @@ router.post("/:parkId/site", addSite);
 
 // Delete a site location by ID
 router.delete("/:parkId/site/:siteId", deleteSiteById);
+
+// Get default park location
+router.delete("/unknown", getUnknownPark);
 
 export default router;
