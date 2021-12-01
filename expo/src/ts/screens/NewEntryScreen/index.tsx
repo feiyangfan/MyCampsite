@@ -1,35 +1,28 @@
-import { signInWithRedirect } from "@firebase/auth";
 import React, { useState } from "react";
 import { View, ScrollView, Text, StyleSheet, TextInput } from "react-native";
 import { Icon } from "react-native-elements";
 import { Button } from "react-native-elements";
 import * as Types from "../../types";
-import { fetch } from "../../lib/api";
+import { fetchJSON } from "../../lib/api";
 
 const NewEntryScreen = ({ route, navigation }: Types.NewEntryScreenNavigationProp) => {
   const [notes, setNotes] = useState("");
 
-  const createPost = () => {
+  const createTextPost = async () => {
     try {
-      fetch("/post", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ siteId: route.params.locationId, notes: notes }),
-      }).then((response) => {
-        alert("Post submitted!");
-        navigation.navigate("Guestbook", {
-          parkId: route.params.parkId,
-          locationId: route.params.locationId,
-          locationName: route.params.locationName,
-        });
-      });
-    } catch (err) {
-      alert("Post failed");
+      const {id} = await fetchJSON("/post", "POST", {
+        siteId: route.params.locationId,
+        notes
+      })
+      const post = await fetchJSON(`/post/${id}`, "POST", {
+        finish: true
+      })
+      console.log(`Finished updating post ${post.id}`)
     }
-  };
+    catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <View style={{ backgroundColor: "#005131" }}>
@@ -43,7 +36,7 @@ const NewEntryScreen = ({ route, navigation }: Types.NewEntryScreenNavigationPro
         </View>
         <Text style={styles.text}> Write a message instead: </Text>
         <TextInput multiline style={styles.input} placeholder={"Notes"} value={notes} onChangeText={(notes) => setNotes(notes)} />
-        <Button buttonStyle={styles.submitBtn} title="Submit Text Entry" onPress={createPost} />
+        <Button buttonStyle={styles.submitBtn} title="Submit Text Entry" onPress={() => createTextPost()} />
       </ScrollView>
     </View>
   );
