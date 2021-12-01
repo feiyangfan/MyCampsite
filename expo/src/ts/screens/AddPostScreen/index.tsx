@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, ActivityIndicator } from 'react-native'
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +24,8 @@ export default function AddPost(props: AddPostScreenNavigationProp) {
     const [image, setImage] = useState<string>();
 
     const [description, setDescription] = useState("")
+    const [querying, setQuerying] = useState(false)
+    const [completed, setCompleted] = useState(false)
 
     // creating thumbnail for video
     // code was inspired by https://docs.expo.dev/versions/latest/sdk/video-thumbnails
@@ -47,15 +49,22 @@ export default function AddPost(props: AddPostScreenNavigationProp) {
         generateThumbnail()
     }, [])
 
-    // prints out file path to video on device
-    //console.log(props.route.params.source)
+    useEffect(() => {
+        if (completed) {
+            alert("Your post has been submitted!")
+            navigation.navigate("Home")
+        }
+    })
 
-    // TO-DO FUNCTION FOR SAVING POST
     const handleSavePost = async () => {
         if (!props.route.params.source || !image) {
             console.error("Missing video or thumbnail")
             return
         }
+        if (querying)
+            return
+
+        setQuerying(true)
         try {
             const { id, signedURL, thumbnailSignedURL } = await fetchJSON("/post", "POST", {
                 siteId: props.route.params.locationId,
@@ -73,9 +82,13 @@ export default function AddPost(props: AddPostScreenNavigationProp) {
                 finish: true
             })
             console.log(`Finished updating post ${post.id}`)
+            setCompleted(true)
         }
         catch (error) {
             console.error(error)
+        }
+        finally {
+            setQuerying(false)
         }
     }
 
@@ -101,9 +114,15 @@ export default function AddPost(props: AddPostScreenNavigationProp) {
                         </TouchableOpacity>
                         {/* handleSavePost is called HERE */}
                         <TouchableOpacity onPress={handleSavePost}
-                            style={styles.postButton}>
-                            <Ionicons name="send-outline" size={24} color="white" />
-                            <Text style={styles.PostButtonText}>Post</Text>
+                                          style={styles.postButton}
+                        >
+                            {querying && <ActivityIndicator size="large" color="white" />}
+                            {!querying &&
+                                <>
+                                    <Ionicons name="send-outline" size={24} color="white" />
+                                    <Text style={styles.PostButtonText}>Post</Text>
+                                </>
+                            }
                         </TouchableOpacity>
                     </View>
                 </ KeyboardAvoidingView>
