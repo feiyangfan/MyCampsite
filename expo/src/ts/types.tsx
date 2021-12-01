@@ -19,8 +19,8 @@ export type RootStackParamList = {
     parkId: any;
   };
   Me: undefined;
-  Record: undefined;
-  AddPost: { source: string };
+  Record: { locationId: string };
+  AddPost: { source: string, locationId: string };
   NewEntry: { parkId: any; locationId: any; locationName: string; source: string };
 };
 

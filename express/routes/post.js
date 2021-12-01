@@ -60,7 +60,7 @@ router.post("/", getProfile(true), async (req, res, next) => {
         const park = await Park.findOne({"sites._id": siteId});
         const site = park.sites.find(site => site._id == siteId);
         if (!site)
-            res.sendStatus(404);
+            return res.sendStatus(404);
 
         // obtain weather
         const weather = await fetchWeather(site);

@@ -37,7 +37,7 @@ const NewEntryScreen = ({ route, navigation }: Types.NewEntryScreenNavigationPro
         <Text style={styles.header}> {route.params.locationName} Guestbook </Text>
         <Text style={styles.text}> Create entry: </Text>
         <View style={styles.iconContainer}>
-          <Icon name="video-call" iconStyle={styles.icon} size={50} onPress={() => navigation.navigate("Record")} />
+          <Icon name="video-call" iconStyle={styles.icon} size={50} onPress={() => navigation.navigate("Record", {locationId: route.params.locationId})} />
           <Icon name="add-a-photo" iconStyle={styles.icon} size={50} />
           <Icon name="mic" iconStyle={styles.icon} size={50} />
         </View>
