@@ -12,20 +12,21 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
   // One dummy post for testing:
   const [posts, setPosts] = useState<any[]>([
     {
-      _id: 0,
+      id: 0,
       createdAt: "2021-01-01T02:57:27.655Z",
       siteId: 1,
       siteName: "Test Site",
       weatherTemp: 20,
       weatherDesc: "Clear",
       notes: "Here's my post!",
+      publicURL: "https://storage.googleapis.com/devel-post-blob-my-campsite-329022/3e751ea9-3f63-40b7-8539-90b110f4f3bd"
     },
   ]);
 
   // Get posts for this site
   useEffect(() => {
     try {
-      fetch(`/location/${locationId}`)
+      fetch(`/post/${locationId}`)
         .then((res) => res.json())
         .then((data) => {
           setPosts([...posts, ...data]);
@@ -85,7 +86,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
         <View style={styles.listContainer}>
           <FlatList
             data={posts}
-            keyExtractor={(item) => item._id.toString()}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <View>
                 <TouchableOpacity style={styles.postThumbnail} onPress={() => navigation.navigate("Post", { post: item })}>
