@@ -7,7 +7,7 @@ import Post from "../models/Post.js";
 import Park from "../models/Park.js";
 import {getEmptyFile} from "../lib/googlecloud.js";
 import {cloudStorageBucket} from "../lib/config.js";
-import Site from "../models/Site.js";
+import {fetchWeather} from "../lib/weather.js";
 
 const router = Router();
 
@@ -55,14 +55,27 @@ router.post("/", getProfile(true), async (req, res, next) => {
         // TODO prevent post and storage file spam
 
         const file = await getEmptyFile(cloudStorageBucket.postBlobs);
-        const site = await Site.findById(siteId);
+
+        // find site
+        const park = await Park.findOne({"sites._id": siteId});
+        const site = park.sites.find(site => site._id == siteId);
         if (!site)
             res.sendStatus(404);
+
+        // obtain weather
+        const weather = await fetchWeather(site);
+        let weatherTemp = "";
+        let weatherDesc = "";
+        if (weather && weather.main && weather.weather && weather.weather.length > 0) {
+            weatherTemp = weather.main.temp;
+            weatherDesc = weather.weather[0].main;
+        }
+
         const post = await Post.create({
             siteId: site,
             notes: `${notes}`,
-            weatherTemp: 12,
-            weatherDesc: "Clear",
+            weatherTemp: weatherTemp,
+            weatherDesc: weatherDesc,
             profile: req.profile,
             file: file.name
         });
