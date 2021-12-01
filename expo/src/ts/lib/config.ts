@@ -1,7 +1,7 @@
 import {releaseChannel} from "expo-updates"
 import {ResponseType} from "expo-auth-session"
 
-let baseURL = "http://10.0.2.2:3000"
+let baseURL = "https://mycampsite-team12-d3.herokuapp.com"
 if (releaseChannel.startsWith("prod-d2"))
     baseURL = "https://mycampsite-team12.herokuapp.com"
 else if (releaseChannel.startsWith("prod-d3"))

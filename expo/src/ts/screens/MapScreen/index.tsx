@@ -142,6 +142,10 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
     });
   }
 
+  // camera defaults
+  const defaultZoom = 19
+  const defaultAltitude = 0.001;
+  
   // set position on location change or when map is loaded
   useEffect(() => {
     if (mapLoaded) {
@@ -153,10 +157,10 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
                 latitude: location[0],
                 longitude: location[1],
               },
-              altitude: appState.current.camera.altitude, 
+              altitude: appState.current.camera.altitude ? appState.current.camera.altitude : defaultAltitude, 
               pitch: appState.current.camera.pitch, 
               heading: appState.current.camera.heading,
-              zoom: appState.current.camera.zoom
+              zoom: appState.current.camera.zoom ? appState.current.camera.zoom : defaultZoom
             }
           , { duration: 700 }); 
         } 
@@ -181,9 +185,9 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
   const appState = useRef({
     camera: {
       pitch: 89.999,
-      zoom: 19,
+      zoom: defaultZoom,
       heading: 0,
-      altitude: 0.001,
+      altitude: defaultAltitude,
       center: {
         latitude: location[0],
         longitude: location[1]
