@@ -119,43 +119,6 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       locationName: locationName,
     });
   };
-  // for testing
-  const sites = [
-    {
-      _id: "1",
-      name: "Stubb's Falls",
-      location: "1, 1",
-      spotlight: true,
-      image: "https://www.linkpicture.com/q/1_1485.jpg",
-    },
-    {
-      _id: "2",
-      name: "site 2",
-      location: "2, 2",
-      spotlight: false,
-    },
-    {
-      _id: "3",
-      name: "Big Bend Lookout",
-      location: "3, 3",
-      spotlight: true,
-      image: "https://www.linkpicture.com/q/bigbend.jpg",
-    },
-    {
-      _id: "4",
-      name: "site 4",
-      location: "4, 4",
-      spotlight: false,
-    },
-    {
-      _id: "5",
-      name: "Arrowhead Skating Trail",
-      location: "5, 5",
-      spotlight: true,
-      image: "https://www.linkpicture.com/q/arrow_1.jpg",
-    },
-  ];
-  // const sites = []
 
   return (
     <View style={styles.container}>
@@ -169,7 +132,7 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
             <GuestbookList parkId={nearestParkId} locations={nearbySites} onGuestbookSelect={onGuestbookSelect} />
           )}
           <Text style={styles.text}>Spotlight:</Text>
-          <Spotlight parkId={nearestParkId} sites={sites} onSpotlightSelect={onGuestbookSelect} />
+          <Spotlight parkId={nearestParkId} sites={allSites} onSpotlightSelect={onGuestbookSelect} />
           <View style={styles.buttonWrapper}>
             <Button buttonStyle={styles.button} title="View Map (Demo)" onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: true })} />
             <Button buttonStyle={styles.button} title="View Map (Live)" onPress={() => navigation.navigate("Map", { ignoreDeviceLocation: false })} />
