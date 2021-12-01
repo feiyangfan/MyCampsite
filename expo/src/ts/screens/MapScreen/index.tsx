@@ -91,21 +91,28 @@ const MapScreen = ({ route, navigation }: Types.MapScreenNavigationProp) => {
         .then(res => res.json())
         .then(data => { 
           const currentPark = data.filter((currentPark: any) => {
-            const { latitudeStart, latitudeEnd, longitudeStart, longitudeEnd } = currentPark.boundary;
-            let minLatitude = Math.min(latitudeStart, latitudeEnd);
-            let maxLatitude = Math.max(latitudeStart, latitudeEnd);
-            let minLongitude = Math.min(longitudeStart, longitudeEnd);
-            let maxLongitude = Math.max(longitudeStart, longitudeEnd);
-            return latitude >= minLatitude 
-              && latitude <= maxLatitude 
-              && longitude >= minLongitude 
-              && longitude <= maxLongitude;
+            const inLatitude =
+              (latitude >= currentPark.boundary.latitudeStart && latitude <= currentPark.boundary.latitudeEnd) ||
+              (latitude <= currentPark.boundary.latitudeStart && latitude >= currentPark.boundary.latitudeEnd);
+            const inLongitude =
+              (longitude >= currentPark.boundary.longitudeStart && longitude <= currentPark.boundary.longitudeEnd) ||
+              (longitude <= currentPark.boundary.longitudeStart && longitude >= currentPark.boundary.longitudeEnd);
+
+            return inLatitude && inLongitude;
           });
           
-          if (currentPark.length > 0) {
-            setPark(currentPark[0]);
+          if (currentPark.length === 0) {
+            fetch("/location/0/unknown")
+              .then((response) => response.json())
+              .then((data) => {
+                setPark(data);
+              });
           } else {
-            setPark({});
+            if (currentPark.length > 0) {
+              setPark(currentPark[0]);
+            } else {
+              setPark({});
+            }
           }
         })
     })();
