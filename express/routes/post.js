@@ -46,8 +46,8 @@ router.get("/:siteId?", async (req, res, next) => {
             return postResponseBody(post);
         }
         return {};
-    }).filter(post => Object.keys(post).length > 0));
-    res.json(filteredPosts);
+    }));
+    res.json(filteredPosts.filter(post => Object.keys(post).length > 0));
 });
 
 router.post("/", getProfile(true), async (req, res, next) => {
