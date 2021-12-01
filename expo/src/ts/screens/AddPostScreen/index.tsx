@@ -49,6 +49,12 @@ export default function AddPost(props: AddPostScreenNavigationProp) {
                 siteId: props.route.params.locationId,
                 notes: description
             })
+            if (!signedURL)
+                throw new Error("Missing signed URL from /post response")
+            const post = await fetchJSON(`/post/${id}`, "POST", {
+                finish: true
+            })
+            console.log(post)
         }
         catch (error) {
             console.error(error)
