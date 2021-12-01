@@ -22,6 +22,7 @@ const postResponseBody = (post) => (
         weatherDesc: post.weatherDesc,
         profile: post.profile,
         publicURL: cloudStorageBucket.postBlobs.file(post.file).publicUrl(),
+        thumbnailPublicURL: post.thumbnailFile ? cloudStorageBucket.postBlobs.file(post.thumbnailFile).publicUrl() : null,
         createdAt: post.createdAt,
     }
 );
@@ -54,8 +55,6 @@ router.post("/", getProfile(true), async (req, res, next) => {
     try {
         // TODO prevent post and storage file spam
 
-        const file = await getEmptyFile(cloudStorageBucket.postBlobs);
-
         // find site
         const park = await Park.findOne({"sites._id": siteId});
         const site = park.sites.find(site => site._id == siteId);
@@ -71,13 +70,16 @@ router.post("/", getProfile(true), async (req, res, next) => {
             weatherDesc = weather.weather[0].main;
         }
 
+        const file = await getEmptyFile(cloudStorageBucket.postBlobs);
+        const thumbnailFile = await getEmptyFile(cloudStorageBucket.postBlobs);
         const post = await Post.create({
             siteId: site,
             notes: `${notes}`,
             weatherTemp: weatherTemp,
             weatherDesc: weatherDesc,
             profile: req.profile,
-            file: file.name
+            file: file.name,
+            thumbnailFile: thumbnailFile.name
         });
 
         const [signedURL] = await file.getSignedUrl({
@@ -85,9 +87,15 @@ router.post("/", getProfile(true), async (req, res, next) => {
             expires: addHours(new Date(), 1),
             version: "v4"
         });
+        const [thumbnailSignedURL] = await thumbnailFile.getSignedUrl({
+            action: "write",
+            expires: addHours(new Date(), 1),
+            version: "v4"
+        });
         res.json({
             id: post.id,
-            signedURL
+            signedURL,
+            thumbnailSignedURL
         });
     }
     catch (error) {
@@ -101,12 +109,12 @@ router.post("/:id", getProfile(true), async (req, res, next) => {
         if (req.profile.id !== post.profile.id) // TODO allow admin
             return res.sendStatus(403);
 
-        if (req.body.finish) {
+        const {finish, notes} = req.body;
+        if (finish) {
             post.finishDate = new Date();
         }
-
-        // TODO other edits
-
+        if (notes)
+            post.notes = notes;
         await post.save();
         return res.json(postResponseBody(post));
     }

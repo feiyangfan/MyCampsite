@@ -45,16 +45,23 @@ export default function AddPost(props: AddPostScreenNavigationProp) {
 
     // TO-DO FUNCTION FOR SAVING POST
     const handleSavePost = async () => {
+        if (!props.route.params.source || !image) {
+            console.error("Missing video or thumbnail")
+            return
+        }
         try {
-            const {id, signedURL} = await fetchJSON("/post", "POST", {
+            const {id, signedURL, thumbnailSignedURL} = await fetchJSON("/post", "POST", {
                 siteId: props.route.params.locationId,
                 notes: description
             })
-            if (!signedURL)
+            if (!signedURL || !thumbnailSignedURL)
                 throw new Error("Missing signed URL from /post response")
-            const {status: uploadStatus} = await uploadAsync(signedURL, props.route.params.source, {httpMethod: "PUT"})
-            if (uploadStatus < 200 || uploadStatus >= 300)
-                throw new Error("Failed to upload")
+            const uploadRes = await uploadAsync(signedURL, props.route.params.source, {httpMethod: "PUT"})
+            if (uploadRes.status < 200 || uploadRes.status >= 300)
+                throw new Error("Failed to upload video")
+            let thumbnailRes = await uploadAsync(thumbnailSignedURL, image, {httpMethod: "PUT"})
+            if (thumbnailRes.status < 200 || thumbnailRes.status >= 300)
+                throw new Error("Failed to upload thumbnail")
             const post = await fetchJSON(`/post/${id}`, "POST", {
                 finish: true
             })

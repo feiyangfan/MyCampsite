@@ -9,19 +9,7 @@ const isAdmin = true; // Temporary
 const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationProp) => {
   const { parkId, locationId, locationName } = route.params;
 
-  // One dummy post for testing:
-  const [posts, setPosts] = useState<any[]>([
-    {
-      id: 0,
-      createdAt: "2021-01-01T02:57:27.655Z",
-      siteId: 1,
-      siteName: "Test Site",
-      weatherTemp: 20,
-      weatherDesc: "Clear",
-      notes: "Here's my post!",
-      publicURL: "https://storage.googleapis.com/devel-post-blob-my-campsite-329022/3e751ea9-3f63-40b7-8539-90b110f4f3bd"
-    },
-  ]);
+  const [posts, setPosts] = useState<any[]>([]);
 
   // Get posts for this site
   useEffect(() => {
@@ -29,7 +17,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
       fetch(`/post/${locationId}`)
         .then((res) => res.json())
         .then((data) => {
-          setPosts([...posts, ...data]);
+          setPosts(data);
         });
     } catch (err) {
       console.log(err);

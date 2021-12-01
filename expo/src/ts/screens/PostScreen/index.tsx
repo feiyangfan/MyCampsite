@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View, StyleSheet, Alert } from "react-native";
-import { Icon } from "react-native-elements";
+import {Icon, Image} from "react-native-elements";
 import * as Types from "../../types";
 import WeatherWidget from "../../components/WeatherWidget";
 
@@ -25,7 +25,7 @@ const formatDate = (dateString: string) => {
 
 const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
   const { post } = route.params;
-  const { _id, createdAt, siteId, siteName, weatherTemp, weatherDesc, notes, publicURL, profile } = post;
+  const { _id, createdAt, siteId, siteName, weatherTemp, weatherDesc, notes, publicURL, thumbnailPublicURL, profile } = post;
 
   const showConfirmDialog = () => {
     return Alert.alert("Delete post", "Are you sure you want to delete this post?", [
@@ -45,7 +45,7 @@ const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
       <Text style={styles.date}>{formatDate(createdAt)}</Text>
       <WeatherWidget temp={weatherTemp} condition={weatherDesc} />
       <View style={styles.contentContainer}>
-        <Text>content goes here</Text>
+        <Image source={{uri: thumbnailPublicURL}} resizeMode="cover" style={styles.thumbnail} />
       </View>
       <Text style={styles.text}>{notes}</Text>
 
@@ -90,6 +90,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+  },
+  thumbnail: {
+    width: 300,
+    height: 300
   },
   deletePost: { flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 10, marginTop: "auto" },
 });
