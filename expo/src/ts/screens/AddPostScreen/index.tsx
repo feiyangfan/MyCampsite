@@ -1,12 +1,19 @@
-import React, {useEffect, useState} from 'react'
-import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
-import {uploadAsync} from "expo-file-system"
-import {AddPostScreenNavigationProp} from "../../types"
-import {fetchJSON} from "../../lib/api"
+import { uploadAsync } from "expo-file-system"
+import { AddPostScreenNavigationProp } from "../../types"
+import { fetchJSON } from "../../lib/api"
+
+const DismissKeyboard = ({ children }) => (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        {children}
+    </TouchableWithoutFeedback>
+
+)
 
 // ignore this error, typescript is just odd
 export default function AddPost(props: AddPostScreenNavigationProp) {
@@ -50,16 +57,16 @@ export default function AddPost(props: AddPostScreenNavigationProp) {
             return
         }
         try {
-            const {id, signedURL, thumbnailSignedURL} = await fetchJSON("/post", "POST", {
+            const { id, signedURL, thumbnailSignedURL } = await fetchJSON("/post", "POST", {
                 siteId: props.route.params.locationId,
                 notes: description
             })
             if (!signedURL || !thumbnailSignedURL)
                 throw new Error("Missing signed URL from /post response")
-            const uploadRes = await uploadAsync(signedURL, props.route.params.source, {httpMethod: "PUT"})
+            const uploadRes = await uploadAsync(signedURL, props.route.params.source, { httpMethod: "PUT" })
             if (uploadRes.status < 200 || uploadRes.status >= 300)
                 throw new Error("Failed to upload video")
-            let thumbnailRes = await uploadAsync(thumbnailSignedURL, image, {httpMethod: "PUT"})
+            let thumbnailRes = await uploadAsync(thumbnailSignedURL, image, { httpMethod: "PUT" })
             if (thumbnailRes.status < 200 || thumbnailRes.status >= 300)
                 throw new Error("Failed to upload thumbnail")
             const post = await fetchJSON(`/post/${id}`, "POST", {
@@ -73,40 +80,42 @@ export default function AddPost(props: AddPostScreenNavigationProp) {
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.descriptionContainer}>
-                {image && <Image source={{ uri: image }} style={styles.thumbnail} />}
-                <TextInput placeholder="Add Post Description"
-                    value={description}
-                    onChangeText={(text) => setDescription(text)}
-                    multiline
-                    maxLength={150} style={styles.description} />
-            </View>
-            <View style={styles.spacer} />
-            <KeyboardAvoidingView 
-            behavior={Platform.OS === "android" ? "height" : "padding"}>
-                <View style={styles.btnsContainer}>
-                    <TouchableOpacity onPress={() => navigation.navigate("Record", {locationId: props.route.params.locationId})}
-                        style={styles.backButton}>
-                        <Feather name="x" size={24} color="black" />
-                        <Text style={styles.backButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    {/* handleSavePost is called HERE */}
-                    <TouchableOpacity onPress={handleSavePost}
-                        style={styles.postButton}>
-                        <Ionicons name="send-outline" size={24} color="white" />
-                        <Text style={styles.PostButtonText}>Post</Text>
-                    </TouchableOpacity>
+        <DismissKeyboard>
+            <View style={styles.container}>
+                <View style={styles.descriptionContainer}>
+                    {image && <Image source={{ uri: image }} style={styles.thumbnail} />}
+                    <TextInput placeholder="Add Post Description"
+                        value={description}
+                        onChangeText={(text) => setDescription(text)}
+                        multiline
+                        maxLength={150} style={styles.description} />
                 </View>
-            </ KeyboardAvoidingView>
-        </View>
+                <View style={styles.spacer} />
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "android" ? "height" : "padding"}>
+                    <View style={styles.btnsContainer}>
+                        <TouchableOpacity onPress={() => navigation.navigate("Record", { locationId: props.route.params.locationId })}
+                            style={styles.backButton}>
+                            <Feather name="x" size={24} color="black" />
+                            <Text style={styles.backButtonText}>Cancel</Text>
+                        </TouchableOpacity>
+                        {/* handleSavePost is called HERE */}
+                        <TouchableOpacity onPress={handleSavePost}
+                            style={styles.postButton}>
+                            <Ionicons name="send-outline" size={24} color="white" />
+                            <Text style={styles.PostButtonText}>Post</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ KeyboardAvoidingView>
+            </View>
+        </DismissKeyboard>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 50,
+        paddingTop: 10,
     },
     descriptionContainer: {
         margin: 20,
