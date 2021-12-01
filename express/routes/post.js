@@ -46,7 +46,7 @@ router.get("/:siteId?", async (req, res, next) => {
             return postResponseBody(post);
         }
         return {};
-    }));
+    }).filter(post => Object.keys(post).length > 0));
     res.json(filteredPosts);
 });
 
