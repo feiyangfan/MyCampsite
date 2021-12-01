@@ -33,21 +33,23 @@ router.get("/:siteId?", async (req, res, next) => {
         res.json([]);
         return;
     }
-    const posts = await Post.find({finishDate: {$ne: null}});
-    const filteredPosts = await Promise.all(posts.filter(async (post) => {
-        const siteId = req.params.siteId ? req.params.siteId : post.siteId;
-        const park = await Park.findOne({"sites._id": siteId});
-        return park;
-    }).map(async (post) => {
-        const siteId = req.params.siteId ? req.params.siteId : post.siteId;
-        const park = await Park.findOne({"sites._id": siteId});
-        if (park) {
-            const site = park.sites.find(site => site._id.toString() == siteId.toString());
-            return postResponseBody(post);
-        }
-        return {};
-    }));
+    const siteId = req.params.siteId ? req.params.siteId : post.siteId;
+    const posts = await Post.find({finishDate: {$ne: null}, siteId: siteId});
+    const filteredPosts = posts.map(post => postResponseBody(post));
     res.json(filteredPosts);
+    // const filteredPosts = await Promise.all(posts.filter(async (post) => {
+    //     const siteId = req.params.siteId ? req.params.siteId : post.siteId;
+    //     const park = await Park.findOne({"sites._id": siteId});
+    //     return park;
+    // }).map(async (post) => {
+    //     const siteId = req.params.siteId ? req.params.siteId : post.siteId;
+    //     const park = await Park.findOne({"sites._id": siteId});
+    //     if (park) {
+    //         const site = park.sites.find(site => site._id.toString() == siteId.toString());
+    //         return postResponseBody(post);
+    //     }
+    //     return {};
+    // }));
 });
 
 router.post("/", getProfile(true), async (req, res, next) => {
