@@ -76,21 +76,23 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
     // Store nearest park
     if (parkArray.length === 0) {
-      //Get ID of "Unknown" park
-      fetch("/location/unknown")
+      // Get ID of "Unknown" park
+      fetch("/location/0/unknown")
         .then((response) => response.json())
-        .then((data) => setNearestParkId(data._id));
+        .then((data) => {
+          setNearestParkId(data._id);
+          setAllSites(data.sites);
+        });
     } else {
+      // Get ID of nearest park
       setNearestParkId(parkArray[0]._id);
+      setAllSites(parkArray[0].sites);
     }
-
-    // Store sites from current list of parks (in case there is more than one):
-    const sites: any[] = [];
-    parkArray.map((park) => sites.push(...park.sites));
-    setAllSites(sites);
   };
 
-  const updateSiteList = (parkId: any) => {};
+  const updateSiteList = () => {
+    const parkId = nearestParkId;
+  };
 
   // Return true if the user is in range of a given site, false otherwise.
   const siteInRange = (site: any) => {

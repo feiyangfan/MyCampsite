@@ -28,6 +28,9 @@ router.post("/", addPark);
 // Delete a park location by ID
 router.delete("/:parkId", deleteParkById);
 
+// Get default park location
+router.get("/:parkId/unknown", getUnknownPark);
+
 // Site information
 
 // Get location of site by ID
@@ -41,8 +44,5 @@ router.post("/:parkId/site", addSite);
 
 // Delete a site location by ID
 router.delete("/:parkId/site/:siteId", deleteSiteById);
-
-// Get default park location
-router.delete("/unknown", getUnknownPark);
 
 export default router;

@@ -110,25 +110,28 @@ export const getUnknownPark = async (req, res) => {
   try {
     let unknownPark = await Park.findOne({ name: "Unknown" });
     if (unknownPark === null) {
-      unknownPark = {
+      unknownPark = new Park({
         name: "Unknown",
         boundary: {
           latitudeStart: -1,
           latitudeEnd: -1,
           longitudeStart: -1,
           longitudeEnd: -1,
-          s,
         },
         location: {
           latitude: -1,
           longitude: -1,
           radius: -1,
         },
-      };
-      Park.insert(unknownPark);
+        sites: [],
+      });
+      const savedPark = await unknownPark.save();
+      res.json(savedPark);
+    } else {
+      res.json(unknownPark);
     }
-    res.json(unknownPark);
   } catch (err) {
     res.sendStatus(400);
+    console.log(err);
   }
 };
