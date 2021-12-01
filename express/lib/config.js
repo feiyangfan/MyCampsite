@@ -41,3 +41,6 @@ export const cloudStorageBucket = {
     profilePics: storage.bucket(`${resourcePrefix}-profile-pics-my-campsite-329022`),
     postBlobs: storage.bucket(`${resourcePrefix}-post-blob-my-campsite-329022`)
 };
+
+export const weatherAPIKey = process.env.OPEN_WEATHER_MAP_KEY;
+export const weatherBaseURL = "https://api.openweathermap.org/data/2.5";
