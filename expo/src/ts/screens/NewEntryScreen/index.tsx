@@ -10,19 +10,18 @@ const NewEntryScreen = ({ route, navigation }: Types.NewEntryScreenNavigationPro
 
   const createTextPost = async () => {
     try {
-      const {id} = await fetchJSON("/post", "POST", {
+      const { id } = await fetchJSON("/post", "POST", {
         siteId: route.params.locationId,
-        notes
-      })
+        notes,
+      });
       const post = await fetchJSON(`/post/${id}`, "POST", {
-        finish: true
-      })
-      console.log(`Finished updating post ${post.id}`)
+        finish: true,
+      });
+      console.log(`Finished updating post ${post.id}`);
+    } catch (error) {
+      console.error(error);
     }
-    catch (error) {
-      console.error(error)
-    }
-  }
+  };
 
   return (
     <View style={{ backgroundColor: "#005131" }}>
@@ -30,7 +29,12 @@ const NewEntryScreen = ({ route, navigation }: Types.NewEntryScreenNavigationPro
         <Text style={styles.header}> {route.params.locationName} Guestbook </Text>
         <Text style={styles.text}> Create entry: </Text>
         <View style={styles.iconContainer}>
-          <Icon name="video-call" iconStyle={styles.icon} size={50} onPress={() => navigation.navigate("Record", {locationId: route.params.locationId})} />
+          <Icon
+            name="video-call"
+            iconStyle={styles.icon}
+            size={50}
+            onPress={() => navigation.navigate("Record", { locationId: route.params.locationId })}
+          />
           <Icon name="add-a-photo" iconStyle={styles.icon} size={50} />
           <Icon name="mic" iconStyle={styles.icon} size={50} />
         </View>
@@ -76,6 +80,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     margin: 15,
     padding: 10,
+    textAlignVertical: "top",
   },
   text: {
     fontSize: 24,

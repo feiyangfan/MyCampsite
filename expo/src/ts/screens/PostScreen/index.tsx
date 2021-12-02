@@ -1,10 +1,10 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Text, View, StyleSheet, Alert } from "react-native";
-import {Icon, Image} from "react-native-elements";
-import {Video} from "expo-av"
+import { Icon, Image } from "react-native-elements";
+import { Video } from "expo-av";
 import * as Types from "../../types";
 import WeatherWidget from "../../components/WeatherWidget";
-import {useSite} from "../../lib/location"
+import { useSite } from "../../lib/location";
 
 const isAdmin = true; // Temporary
 
@@ -28,8 +28,8 @@ const formatDate = (dateString: string) => {
 const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
   const { post } = route.params;
   const { _id, createdAt, siteId, weatherTemp, weatherDesc, notes, publicURL, thumbnailPublicURL, profile } = post;
-  const [showPlayer, setShowPlayer] = useState(false)
-  const site = useSite(siteId, route.params.parkId)
+  const [showPlayer, setShowPlayer] = useState(false);
+  const site = useSite(siteId, route.params.parkId);
 
   const showConfirmDialog = () => {
     return Alert.alert("Delete post", "Are you sure you want to delete this post?", [
@@ -49,31 +49,17 @@ const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
       <Text style={styles.date}>{formatDate(createdAt)}</Text>
       <WeatherWidget temp={weatherTemp} condition={weatherDesc} />
       <View style={styles.contentContainer}>
-        {showPlayer &&
-            <Video
-                style={styles.thumbnail}
-                source={{uri: publicURL}}
-                useNativeControls
-                isLooping
-                shouldPlay
-                resizeMode="contain"
-            />
-        }
-        {!showPlayer &&
-            <Image
-                source={{uri: thumbnailPublicURL}}
-                resizeMode="cover"
-                style={styles.thumbnail}
-                onPress={() => setShowPlayer(true)}
-            />
-        }
+        {showPlayer && <Video style={styles.thumbnail} source={{ uri: publicURL }} useNativeControls isLooping shouldPlay resizeMode="contain" />}
+        {!showPlayer && (
+          <Image source={{ uri: thumbnailPublicURL }} resizeMode="cover" style={styles.thumbnail} onPress={() => setShowPlayer(true)} />
+        )}
       </View>
       <Text style={styles.text}>{notes}</Text>
 
       {isAdmin && (
         <View style={styles.deletePost}>
           <Icon name="remove-circle-outline" color="red" size={30} onPress={showConfirmDialog} />
-          <Text style={styles.text}>Delete this post</Text>
+          <Text style={styles.deleteText}>Delete this post</Text>
         </View>
       )}
     </View>
@@ -112,9 +98,15 @@ const styles = StyleSheet.create({
   },
   thumbnail: {
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
   deletePost: { flex: 1, flexDirection: "row", justifyContent: "center", alignItems: "center", padding: 10, marginTop: "auto" },
+  deleteText: {
+    fontSize: 20,
+    textAlign: "center",
+    color: "white",
+    margin: 10,
+  },
 });
 
 export default PostScreen;
