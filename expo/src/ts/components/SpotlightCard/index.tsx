@@ -1,31 +1,51 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ImageBackground,
+} from "react-native";
 
 const SpotlightCard = (props: any) => {
   const { parkId, siteId, siteName, siteImage } = props;
+  // if background image is set
   if (siteImage) {
     return (
       <View>
-        <TouchableOpacity style={styles.card} onPress={() => props.onSpotlightSelect(parkId, siteId, siteName)}>
-          <ImageBackground source={{ uri: siteImage }} resizeMode="cover" style={styles.image} imageStyle={{ borderRadius: 25 }}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => props.onSpotlightSelect(parkId, siteId, siteName)}
+        >
+          <ImageBackground
+            source={{ uri: siteImage }}
+            resizeMode="cover"
+            style={styles.image}
+            imageStyle={{ borderRadius: 25 }}
+          >
             <Text style={styles.cardText}>{siteName}</Text>
           </ImageBackground>
         </TouchableOpacity>
       </View>
     );
+  // no background image
   } else {
     return (
       <View>
         <TouchableOpacity
           style={[styles.card, { borderRadius: 25, backgroundColor: "white" }]}
-          onPress={() => props.onSpotlightSelect(parkId, siteId, siteName)}>
-          <Text style={[styles.cardText, { color: "#005131" }]}>{siteName}</Text>
+          onPress={() => props.onSpotlightSelect(parkId, siteId, siteName)}
+        >
+          <Text style={[styles.cardText, { color: "#005131" }]}>
+            {siteName}
+          </Text>
         </TouchableOpacity>
       </View>
     );
   }
 };
 
+// style for spotlight card
 const styles = StyleSheet.create({
   cardText: {
     padding: 10,
@@ -38,7 +58,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   card: {
-    margin: 6,
+    margin: 8,
     width: 150,
     height: 250,
     justifyContent: "center",

@@ -62,17 +62,18 @@ const WeatherWidget = (props: {temp: number, condition: string}) => {
 
 }
 
+// style for WeatherWidget
 const styles = StyleSheet.create({
     container: {
         width: "37%",
-        padding: 7, // can be changed
+        padding: 7,
         backgroundColor: "#2d3436",
         borderRadius: 10,
         flexDirection: 'row',
         justifyContent: "center"
     },
     tempText: {
-        paddingRight: 10,// can be changed
+        paddingRight: 10,
         color: '#ffffff',
         fontSize: 20,
         fontWeight: 'bold',

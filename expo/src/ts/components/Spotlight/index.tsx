@@ -8,7 +8,8 @@ const Spotlight = (props: any) => {
   const filteredSites = sites.filter((site: any) => {
     return site.spotlight === true;
   });
-  
+
+  // if there are spotlights
   if (filteredSites.length == 0) {
     return (
       <View style={styles.container}>
@@ -20,7 +21,11 @@ const Spotlight = (props: any) => {
   } else {
     return (
       <View>
-        <ScrollView contentContainerStyle={{ marginTop: 15 }} horizontal={true} showsHorizontalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={{ marginTop: 15 }}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+        >
           {filteredSites.map((site: any) => {
             return (
               <SpotlightCard
