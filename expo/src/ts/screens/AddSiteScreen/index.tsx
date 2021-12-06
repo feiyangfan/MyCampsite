@@ -12,9 +12,12 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
   const [park, setPark] = useState("");
   const [radius, setRadius] = useState("");
   const [type, setType] = useState("Campsite");
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [spotlight, setSpotlight] = useState(false);
+  const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
+  const [selectedSpotlightIndex, setSelectedSpotlightIndex] = useState(1);
 
-  const buttons = ["Campsite", "Point of Interest"];
+  const typeButtons = ["Campsite", "Point of Interest"];
+  const spotlightButtons = ["yes", "no"];
 
   // Get park name to suggest
   useEffect(() => {
@@ -30,11 +33,15 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
   const findPark = (parkName: String) => {}; //TODO
 
   const handleSelectType = (index: any) => {
-    setSelectedIndex(index);
+    setSelectedTypeIndex(index);
     if (index === 0) setType("campsite");
     else if (index === 1) setType("point of interest");
   };
-
+  const handleSelectSpotlight = (index: any) => {
+    setSelectedSpotlightIndex(index);
+    if (index === 0) setSpotlight(true);
+    else if (index === 1) setSpotlight(false);
+  };
   const handleAddSite = () => {
     try {
       fetch(`/location/${parkId}/site/`, {
@@ -50,7 +57,7 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
             longitude: location[1],
             radius: radius ? Number.parseInt(radius) : 200,
             type: type,
-            spotlight: false,
+            spotlight: spotlight,
           },
         }),
       });
@@ -82,8 +89,21 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
               <View style={styles.buttonsContainer}>
                 <ButtonGroup
                   onPress={handleSelectType.bind(this)}
-                  selectedIndex={selectedIndex}
-                  buttons={buttons}
+                  selectedIndex={selectedTypeIndex}
+                  buttons={typeButtons}
+                  containerStyle={{ height: "100%", width: "100%", marginLeft: 0 }}
+                  buttonContainerStyle={{ backgroundColor: "#00301D" }}
+                  selectedButtonStyle={{ backgroundColor: "#00AB67" }}
+                />
+              </View>
+            </View>
+            <View style={styles.fieldContainer}>
+              <Text style={styles.text}> Spotlight this site: </Text>
+              <View style={styles.buttonsContainer}>
+                <ButtonGroup
+                  onPress={handleSelectSpotlight.bind(this)}
+                  selectedIndex={selectedSpotlightIndex}
+                  buttons={spotlightButtons}
                   containerStyle={{ height: "100%", width: "100%", marginLeft: 0 }}
                   buttonContainerStyle={{ backgroundColor: "#00301D" }}
                   selectedButtonStyle={{ backgroundColor: "#00AB67" }}
