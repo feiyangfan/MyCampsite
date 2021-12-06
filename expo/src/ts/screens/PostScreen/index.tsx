@@ -5,19 +5,9 @@ import { Video } from "expo-av";
 import * as Types from "../../types";
 import WeatherWidget from "../../components/WeatherWidget";
 import { useSite } from "../../lib/location";
+import { fetch } from "../../lib/api";
 
 const isAdmin = true; // Temporary
-
-const deletePost = (postId: any) => {
-  try {
-    alert("This doesn't work yet!");
-    // fetch(`/post/${postId}`, {
-    //   method: "DELETE",
-    // });
-  } catch (err) {
-    alert("Failed to delete post");
-  }
-};
 
 // Format date
 const formatDate = (dateString: string) => {
@@ -27,16 +17,29 @@ const formatDate = (dateString: string) => {
 
 const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
   const { post } = route.params;
-  const { _id, createdAt, siteId, weatherTemp, weatherDesc, notes, publicURL, thumbnailPublicURL, profile } = post;
+  const { id, createdAt, siteId, weatherTemp, weatherDesc, notes, publicURL, thumbnailPublicURL, profile } = post;
   const [showPlayer, setShowPlayer] = useState(false);
   const site = useSite(siteId, route.params.parkId);
+
+  const deletePost = async (postId: any) => {
+    try {
+      await fetch(`/post/${postId}`, {
+        method: "DELETE",
+      });
+      alert("Post deleted!");
+      navigation.navigate("Home");
+    } catch (err) {
+      alert("Failed to delete post");
+      console.log(err);
+    }
+  };
 
   const showConfirmDialog = () => {
     return Alert.alert("Delete post", "Are you sure you want to delete this post?", [
       {
         text: "Yes",
         onPress: () => {
-          deletePost(_id);
+          deletePost(id);
         },
       },
       { text: "No" },
