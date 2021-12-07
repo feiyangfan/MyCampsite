@@ -45,12 +45,12 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
   const handleAddSite = async () => {
     let newSite = {
       name: name,
+      spotlight: spotlight,
       location: {
         latitude: location[0],
         longitude: location[1],
         radius: radius ? Number.parseInt(radius) : 200,
         type: type,
-        spotlight: spotlight,
       },
     };
     console.log(parkId, name, location, radius, type, spotlight);

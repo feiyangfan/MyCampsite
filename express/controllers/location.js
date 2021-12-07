@@ -76,6 +76,7 @@ export const addSite = async (req, res) => {
   const newSite = new Site({
     name: req.body.name,
     location: req.body.location,
+    spotlight: req.body.spotlight,
   });
 
   try {

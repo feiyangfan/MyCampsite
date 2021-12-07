@@ -114,7 +114,6 @@ const HomeScreen = ({ route, navigation }: Types.HomeScreenNavigationProp) => {
   }, [userLocation]);
 
   // Navigate to the guestbook screen for the specified location
-  // TODO: Change this function when database is connected
   const onGuestbookSelect = (parkId: any, locationId: any, locationName: string) => {
     navigation.navigate("Guestbook", {
       parkId: parkId,
@@ -123,15 +122,17 @@ const HomeScreen = ({ route, navigation }: Types.HomeScreenNavigationProp) => {
     });
   };
 
-  // Update guestbook list if site is deleted
+  // Update all sites if site is deleted
   useEffect(() => {
     if (route.params?.deleteSite) {
       const filteredSites = allSites.filter((site) => site._id !== route.params.deleteSite);
       setAllSites(filteredSites);
+      console.log("Nearby:", ...nearbySites);
+      console.log("All:", ...allSites);
     }
   }, [route.params?.deleteSite]);
 
-  // Update guestbook list if site is added
+  // Update all sites if site is added
   useEffect(() => {
     if (route.params?.addSite) {
       const filteredSites = allSites.filter((site) => site._id !== route.params.addSite); // Prevent duplicate
