@@ -61,7 +61,7 @@ const App = () => {
             screenOptions={{
               title: "My Campsite",
             }}>
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Home" component={HomeScreen} initialParams={{ deleteSite: null, addSite: null }} />
             <Stack.Screen name="Map" component={MapScreen} />
             <Stack.Screen name="Guestbook" component={GuestbookScreen} />
             <Stack.Screen name="Post" component={PostScreen} />

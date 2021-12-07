@@ -32,6 +32,7 @@ const GuestbookScreen = ({ route, navigation }: Types.GuestbookScreenNavigationP
         onPress: () => {
           deleteSite(parkId, locationId);
           alert("Site deleted!");
+          navigation.navigate({ name: "Home", params: { addSite: null, deleteSite: locationId }, merge: true });
         },
       },
       { text: "No" },

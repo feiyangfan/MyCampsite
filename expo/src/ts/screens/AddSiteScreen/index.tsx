@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, TextInput, ScrollView } from "react-native";
 import { Button, ButtonGroup } from "react-native-elements";
 import * as Types from "../../types";
-import { fetch } from "../../lib/api";
+import { fetch, fetchJSON } from "../../lib/api";
 
 const isAdmin = true; // For testing, give admin capability to all users. Must update later
 
@@ -42,36 +42,31 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
     if (index === 0) setSpotlight(true);
     else if (index === 1) setSpotlight(false);
   };
-  const handleAddSite = () => {
+  const handleAddSite = async () => {
+    let newSite = {
+      name: name,
+      location: {
+        latitude: location[0],
+        longitude: location[1],
+        radius: radius ? Number.parseInt(radius) : 200,
+        type: type,
+        spotlight: spotlight,
+      },
+    };
+    console.log(parkId, name, location, radius, type, spotlight);
     try {
-      fetch(`/location/${parkId}/site/`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: name,
-          location: {
-            latitude: location[0],
-            longitude: location[1],
-            radius: radius ? Number.parseInt(radius) : 200,
-            type: type,
-            spotlight: spotlight,
-          },
-        }),
-      });
-
-      setName("");
-      setRadius("");
+      const savedSite = await fetchJSON(`/location/${parkId}/site`, "POST", newSite);
       alert("Site added!");
+      navigation.navigate({ name: "Home", params: { addSite: savedSite, deleteSite: null }, merge: true });
     } catch (err) {
+      console.log(err);
       alert("Add site failed");
     }
   };
   return (
     <View style={{ backgroundColor: "#005131" }}>
-      <ScrollView keyboardShouldPersistTaps="never" contentContainerStyle={styles.container}>
+      <Button buttonStyle={styles.addBtn} titleStyle={styles.btnText} title="Add Site" onPress={handleAddSite} />
+      <ScrollView keyboardShouldPersistTaps="never" contentContainerStyle={styles.container} nestedScrollEnabled={true}>
         <Text style={styles.header}>Add a new site at your current location:</Text>
         <View style={styles.fieldContainer}>
           <Text style={styles.text}> Park name: </Text>
@@ -116,8 +111,6 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
             </View>
           </View>
         )}
-
-        <Button buttonStyle={styles.addBtn} titleStyle={styles.btnText} title="Add Site" onPress={handleAddSite} />
       </ScrollView>
     </View>
   );

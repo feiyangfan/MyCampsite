@@ -4,12 +4,11 @@ import { Button } from "react-native-elements";
 import * as Location from "expo-location";
 import * as geolib from "geolib";
 import { fetch } from "../../lib/api";
-
 import * as Types from "../../types";
 import GuestbookList from "../../components/GuestbookList";
 import Spotlight from "../../components/Spotlight";
 
-const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
+const HomeScreen = ({ route, navigation }: Types.HomeScreenNavigationProp) => {
   const [nearbySites, setNearbySites] = useState<any[]>([]);
   const [allSites, setAllSites] = useState<any[]>([]);
   const [userLocation, setUserLocation] = useState<number[]>([]);
@@ -30,8 +29,9 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
 
       // Get initial location and determine current park
       const location = await Location.getCurrentPositionAsync();
-      setUserLocation([location.coords.latitude, location.coords.longitude]);
-      initializeSiteList(location);
+      const locationArray = [location.coords.latitude, location.coords.longitude];
+      setUserLocation(locationArray);
+      initializeSiteList(locationArray);
 
       // Subscribe to location updates
       watchPosition();
@@ -50,26 +50,29 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
   };
 
   // Initialize list of all sites within any park the user is near
-  const initializeSiteList = (location: { coords: { latitude: number; longitude: number } }) => {
+  const initializeSiteList = (locationArray: number[]) => {
     // Fetch parks list
     let parks: any[] = [];
 
     fetch("/location")
       .then((response) => response.json())
       .then((data) => (parks = data))
-      .then(() => determineCurrentPark(location, parks))
+      .then(() => determineCurrentPark(locationArray, parks))
       .then(() => setLoading(false));
   };
 
   // Determine which park a user is in, if any, and set the sites to check based on park
-  const determineCurrentPark = (location: { coords: { latitude: number; longitude: number } }, parks: any[]) => {
+  const determineCurrentPark = (locationArray: number[], parks: any[]) => {
+    // Should be updated to use mongoDB's search by geoindex feature
+    const latitude = locationArray[0];
+    const longitude = locationArray[1];
     const parkArray = parks.filter((currentPark) => {
       const inLatitude =
-        (location.coords.latitude >= currentPark.boundary.latitudeStart && location.coords.latitude <= currentPark.boundary.latitudeEnd) ||
-        (location.coords.latitude <= currentPark.boundary.latitudeStart && location.coords.latitude >= currentPark.boundary.latitudeEnd);
+        (latitude >= currentPark.boundary.latitudeStart && latitude <= currentPark.boundary.latitudeEnd) ||
+        (latitude <= currentPark.boundary.latitudeStart && latitude >= currentPark.boundary.latitudeEnd);
       const inLongitude =
-        (location.coords.longitude >= currentPark.boundary.longitudeStart && location.coords.longitude <= currentPark.boundary.longitudeEnd) ||
-        (location.coords.longitude <= currentPark.boundary.longitudeStart && location.coords.longitude >= currentPark.boundary.longitudeEnd);
+        (longitude >= currentPark.boundary.longitudeStart && longitude <= currentPark.boundary.longitudeEnd) ||
+        (longitude <= currentPark.boundary.longitudeStart && longitude >= currentPark.boundary.longitudeEnd);
 
       return inLatitude && inLongitude;
     });
@@ -119,6 +122,22 @@ const HomeScreen = ({ navigation }: Types.HomeScreenNavigationProp) => {
       locationName: locationName,
     });
   };
+
+  // Update guestbook list if site is deleted
+  useEffect(() => {
+    if (route.params?.deleteSite) {
+      const filteredSites = allSites.filter((site) => site._id !== route.params.deleteSite);
+      setAllSites(filteredSites);
+    }
+  }, [route.params?.deleteSite]);
+
+  // Update guestbook list if site is added
+  useEffect(() => {
+    if (route.params?.addSite) {
+      const filteredSites = allSites.filter((site) => site._id !== route.params.addSite); // Prevent duplicate
+      setAllSites([...filteredSites, route.params.addSite]);
+    }
+  }, [route.params?.addSite]);
 
   return (
     <View style={styles.container}>

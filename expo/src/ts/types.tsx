@@ -1,7 +1,10 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 export type RootStackParamList = {
-  Home: undefined;
+  Home: {
+    deleteSite: any;
+    addSite: any;
+  };
   Map: {
     ignoreDeviceLocation: boolean;
   };
@@ -21,7 +24,7 @@ export type RootStackParamList = {
   };
   Me: undefined;
   Record: { locationId: string };
-  AddPost: { source: string, locationId: string };
+  AddPost: { source: string; locationId: string };
   NewEntry: { parkId: any; locationId: any; locationName: string; source: string };
 };
 
