@@ -64,9 +64,8 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
     }
   };
   return (
-    <View style={{ backgroundColor: "#005131" }}>
-      <Button buttonStyle={styles.addBtn} titleStyle={styles.btnText} title="Add Site" onPress={handleAddSite} />
-      <ScrollView keyboardShouldPersistTaps="never" contentContainerStyle={styles.container} nestedScrollEnabled={true}>
+    <View style={styles.container}>
+      <ScrollView keyboardShouldPersistTaps="never" style={styles.scrollContainer} nestedScrollEnabled={true}>
         <Text style={styles.header}>Add a new site at your current location:</Text>
         <View style={styles.fieldContainer}>
           <Text style={styles.text}> Park name: </Text>
@@ -111,19 +110,20 @@ const AddSiteScreen = ({ route, navigation }: Types.AddSiteScreenNavigationProp)
             </View>
           </View>
         )}
+        <View style={{ alignItems: "center", paddingBottom: 30 }}>
+          <Button buttonStyle={styles.addBtn} titleStyle={styles.btnText} title="Add Site" onPress={handleAddSite} />
+        </View>
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#005131",
-    color: "white",
+  container: { backgroundColor: "#005131", flex: 1, height: "100%", flexDirection: "column", justifyContent: "flex-start" },
+  scrollContainer: {
+    backgroundColor: "transparent",
     height: "100%",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    alignItems: "center",
+    color: "white",
   },
   fieldContainer: {
     width: "100%",
