@@ -12,7 +12,8 @@ export type PublicProfile = {
     displayName?: string,
     profilePicURL?: string,
     creationDate: Date,
-    private?: PrivateProfile
+    private?: PrivateProfile,
+    admin: boolean
 }
 
 export const useProfile = (id?: string) => {
@@ -40,5 +41,5 @@ export const useProfile = (id?: string) => {
             .finally(() => setQuerying(false))
     }
 
-    return {profile, querying, update}
+    return {value: profile, querying, update}
 }

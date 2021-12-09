@@ -6,8 +6,7 @@ import * as Types from "../../types";
 import WeatherWidget from "../../components/WeatherWidget";
 import { useSite } from "../../lib/location";
 import { fetch } from "../../lib/api";
-
-const isAdmin = true; // Temporary
+import {useProfile} from "../../lib/profile"
 
 // Format date
 const formatDate = (dateString: string) => {
@@ -17,9 +16,10 @@ const formatDate = (dateString: string) => {
 
 const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
   const { post } = route.params;
-  const { id, createdAt, siteId, weatherTemp, weatherDesc, notes, publicURL, thumbnailPublicURL, profile } = post;
+  const { id, createdAt, siteId, weatherTemp, weatherDesc, notes, publicURL, thumbnailPublicURL, profile: profileID } = post;
   const [showPlayer, setShowPlayer] = useState(false);
   const site = useSite(siteId, route.params.parkId);
+  const profile = useProfile()
 
   const deletePost = async (postId: any) => {
     try {
@@ -59,7 +59,7 @@ const PostScreen = ({ route, navigation }: Types.PostScreenNavigationProp) => {
       </View>
       <Text style={styles.text}>{notes}</Text>
 
-      {isAdmin && (
+      {(profile.value?.id == profileID || profile.value?.admin) && (
         <View style={styles.deletePost}>
           <Icon name="remove-circle-outline" color="red" size={30} onPress={showConfirmDialog} />
           <Text style={styles.deleteText}>Delete this post</Text>

@@ -4,16 +4,16 @@ import {Avatar, Button, Card, Text} from "react-native-elements"
 import {useProfile} from "../lib/profile"
 
 const Profile = (props: {id?: string, edit?: boolean}) => {
-    const {profile, querying, update} = useProfile(props.id)
+    const profile = useProfile(props.id)
 
-    if (querying)
+    if (profile.querying)
         return <ActivityIndicator color="blue" size="large" />
     return (
         <Card>
             <View style={{flexDirection: "row"}}>
                 <Avatar
                     size="large"
-                    source={{uri: profile?.profilePicURL}}
+                    source={{uri: profile.value?.profilePicURL}}
                     title="ME"
                 >
                     {
@@ -25,8 +25,8 @@ const Profile = (props: {id?: string, edit?: boolean}) => {
                     }
                 </Avatar>
                 <View style={{justifyContent: "space-evenly"}}>
-                    <Text>{profile?.displayName ?? "No name"}</Text>
-                    <Text>Joined since: {profile?.creationDate}</Text>
+                    <Text>{profile.value?.displayName ?? "No name"}</Text>
+                    <Text>Joined since: {profile.value?.creationDate}</Text>
                 </View>
             </View>
         </Card>

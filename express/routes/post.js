@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { ObjectId } from "mongodb";
+import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import { addHours } from "date-fns";
 import { getProfile } from "../lib/profile.js";
@@ -19,7 +20,7 @@ const postResponseBody = (post) => ({
   notes: post.notes,
   weatherTemp: post.weatherTemp,
   weatherDesc: post.weatherDesc,
-  profile: post.profile,
+  profile: post.profile instanceof mongoose.Model ? post.profile.id : post.profile,
   publicURL: cloudStorageBucket.postBlobs.file(post.file).publicUrl(),
   thumbnailPublicURL: post.thumbnailFile ? cloudStorageBucket.postBlobs.file(post.thumbnailFile).publicUrl() : null,
   createdAt: post.createdAt,
@@ -29,8 +30,7 @@ router.delete("/:id", getProfile(true), async (req, res) => {
   console.log("trying to delete", req.params.id);
   try {
     const post = await Post.findById(req.params.id).populate("profile");
-    if (req.profile.id !== post.profile.id)
-      // TODO allow admin
+    if (req.profile.id !== post.profile.id && !req.admin)
       return res.sendStatus(403);
     const deletedPost = await Post.deleteOne({ _id: req.params.id });
     console.log(deletedPost);
@@ -119,8 +119,7 @@ router.post("/", getProfile(true), async (req, res, next) => {
 router.post("/:id", getProfile(true), async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id).populate("profile");
-    if (req.profile.id !== post.profile.id)
-      // TODO allow admin
+    if (req.profile.id !== post.profile.id && !req.admin)
       return res.sendStatus(403);
 
     const { finish, notes } = req.body;

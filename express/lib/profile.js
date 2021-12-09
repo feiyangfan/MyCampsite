@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import PublicProfile from "../models/PublicProfile.js";
 import {authenticate, uploadProfilePic} from "./googlecloud.js";
+import Permission from "../models/Permission.js";
 
 /**
  * Find or create a profile. When creating new profiles, user info is copied from the Firebase user
@@ -42,14 +43,21 @@ export const copyProfilePic = async (payload) => {
 /**
  * Query the authenticated user's profile and store in <code>request.profile</code>
  * @param must Send error response if not authenticated
- * @param admin Send error response if user is not admin
+ * @param mustAdmin Send error response if user is not admin
  */
-export const getProfile = (must = false, admin = false) => [
+export const getProfile = (must = false, mustAdmin = false) => [
     authenticate(must),
     async (req, res, next) => {
         try {
             req.profile = await findOrCreateByUser(req.user);
-            // TODO admin check
+
+            const perms = await Permission.findOne({profile: req.profile});
+            if (perms?.admin)
+                req.admin = true;
+            else if (mustAdmin)
+                return res.sendStatus(403);
+            else
+                req.admin = false;
         }
         catch (error) {
             next(error);

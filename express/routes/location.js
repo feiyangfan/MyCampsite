@@ -11,6 +11,7 @@ import {
   deleteSiteById,
   getUnknownPark,
 } from "../controllers/location.js";
+import {getProfile} from "../lib/profile.js";
 
 const router = express.Router();
 
@@ -23,10 +24,10 @@ router.get("/", getAllParks);
 router.get("/:parkId/", getParkById);
 
 // Add a new park location
-router.post("/", addPark);
+router.post("/", getProfile(true, true), addPark);
 
 // Delete a park location by ID
-router.delete("/:parkId", deleteParkById);
+router.delete("/:parkId", getProfile(true, true), deleteParkById);
 
 // Get default park location
 router.get("/:parkId/unknown", getUnknownPark);

@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import PublicProfile from "../models/PublicProfile.js";
 import {authenticate} from "../lib/googlecloud.js";
 import {findOrCreateByUser, copyProfilePic} from "../lib/profile.js";
+import Permission from "../models/Permission.js";
 
 const router = Router();
 router.use(bodyParser.json());
@@ -15,13 +16,25 @@ const profileResponse = async (req, res, next) => {
 
     try {
         const profile = id ? await PublicProfile.findById(id) : await findOrCreateByUser(user);
+        const body = {
+            id: profile.id,
+            uid: profile.uid,
+            displayName: profile.displayName,
+            profilePicURL: profile.profilePicURL,
+            creationDate: profile.creationDate
+        };
+
         if (profile.uid === user?.uid) {
-            profile.private = {
+            body.private = {
                 email: req.user?.email,
                 emailVerified: req.user?.emailVerified
             };
         }
-        res.json(profile);
+
+        const perms = await Permission.findOne({profile});
+        body.admin = perms?.admin === true;
+
+        res.json(body);
     }
     catch (error) {
         next(error);
@@ -35,7 +48,7 @@ const setProfile = async (req, res, next) => {
 
     try {
         let profile = id ? await PublicProfile.findById(id) : await findOrCreateByUser(user);
-        if (profile.uid !== user?.uid)
+        if (profile.uid !== user?.uid && !req.admin)
             return res.sendStatus(403);
 
         if (body.displayName)
