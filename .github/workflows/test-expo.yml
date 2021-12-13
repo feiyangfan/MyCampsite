@@ -1,0 +1,21 @@
+name: Test Expo App
+
+on:
+  push:
+    paths:
+      - "expo/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: expo
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install
+        run: npm install
+
+      - name: Test
+        run: npm run test

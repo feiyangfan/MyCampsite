@@ -1,0 +1,23 @@
+name: Test Express App
+
+on:
+  push:
+    paths:
+      - "express/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GCP_SERVICE_ACCOUNT_KEY_ASC: ${{secrets.GCP_SERVICE_ACCOUNT_KEY_ASC}}
+    defaults:
+      run:
+        working-directory: express
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install
+        run: npm install
+
+      - name: Test
+        run: npm run test
