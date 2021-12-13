@@ -6,4 +6,5 @@ This note is added after our discussion with course instructor at 8:19PM on Nov 
 
 User guide, setup and deploument instructions, and feature documentations:
 ==========================================================================
-[pdf](./handoff.pdf)
+- [pdf](./handoff.pdf)
+- [demo video](https://drive.google.com/file/d/1lSYajWDHkrAA8BcowKCixXZ1bj_kspd1/view?usp=sharing)
