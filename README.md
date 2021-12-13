@@ -5,4 +5,5 @@ Deliverable 2 is located on [deliverable-2 branch](https://github.com/csc301-fal
 This note is added after our discussion with course instructor at 8:19PM on Nov 1st.
 
 User guide, setup and deploument instructions, and feature documentations:
+==========================================================================
 [pdf](./handoff.pdf)
